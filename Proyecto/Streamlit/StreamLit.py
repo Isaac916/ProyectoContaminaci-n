@@ -2,18 +2,10 @@ import pandas as pd
 import streamlit as st
 import plotly.express as px
 
-dataElche = pd.read_csv(
-    "C:/Users/javie/Documents/ProyectoIABD25/ProyectoContaminaci-n/Proyecto/Procesamiento/Elche-Limpio.csv",
-    decimal=",", sep=";"
-)
-dataOrihuela = pd.read_csv(
-    "C:/Users/javie/Documents/ProyectoIABD25/ProyectoContaminaci-n/Proyecto/Procesamiento/Orihuela-Limpio.csv",
-    decimal=",", sep=";"
-)
-dataTorrevieja = pd.read_csv(
-    "C:/Users/javie/Documents/ProyectoIABD25/ProyectoContaminaci-n/Proyecto/Procesamiento/Torrevieja-Limpio.csv",
-    decimal=",", sep=";"
-)
+dataElche = pd.read_csv("../Data/Elche-Limpio.csv", decimal=",", sep=";")
+dataOrihuela = pd.read_csv("../Data/Orihuela-Limpio.csv", decimal=",", sep=";")
+dataTorrevieja = pd.read_csv("../Data/Torrevieja-Limpio.csv", decimal=",", sep=";")
+
 
 st.set_page_config(page_title="Proyecto Contaminación", page_icon=":mask:", layout="wide")
 st.markdown("## Datos generales sobre la contaminación en las siguientes estaciones de la provincia de Alicante: Elche, Orihuela y Torrevieja.")
