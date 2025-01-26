@@ -2,14 +2,22 @@ import pandas as pd
 import streamlit as st
 import plotly.express as px
 
-dataElche = pd.read_csv("Data/Elche-Limpio.csv", decimal=",", sep=";")
-dataOrihuela = pd.read_csv("Data/Orihuela-Limpio.csv", decimal=",", sep=";")
-dataTorrevieja = pd.read_csv("Data/Torrevieja-Limpio.csv", decimal=",", sep=";")
+import os
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+dataElche = pd.read_csv(os.path.join(BASE_DIR, "../Data/Elche-Limpio.csv"), decimal=",", sep=";")
+dataOrihuela = pd.read_csv(os.path.join(BASE_DIR, "../Data/Orihuela-Limpio.csv"), decimal=",", sep=";")
+dataTorrevieja = pd.read_csv(os.path.join(BASE_DIR, "../Data/Torrevieja-Limpio.csv"), decimal=",", sep=";")
+
+
 
 
 st.set_page_config(page_title="Proyecto Contaminación", page_icon=":mask:", layout="wide")
 st.markdown("## Datos generales sobre la contaminación en las siguientes estaciones de la provincia de Alicante: Elche, Orihuela y Torrevieja.")
-st.sidebar.image("Assets/Contaminacion.png")
+
+image_path = os.path.join(BASE_DIR, "../Assets/Contaminacion.png")
+
+st.sidebar.image(image_path)
 
 if "mostrar_leyenda" not in st.session_state:
     st.session_state.mostrar_leyenda = False
@@ -153,3 +161,16 @@ else:
     )
 
     st.plotly_chart(fig, use_container_width=True)
+
+
+st.markdown("## Consulta de contaminación por día específico")
+
+fecha_seleccionada = st.date_input("Selecciona una fecha para consultar la contaminación:")
+
+data_filtrada_por_dia = data_combinada[data_combinada["FECHA"] == fecha_seleccionada.strftime("%Y-%m-%d")]
+
+if data_filtrada_por_dia.empty:
+    st.warning(f"No hay datos disponibles para la fecha {fecha_seleccionada}.")
+else:
+    st.markdown(f"### Datos de contaminación para el día {fecha_seleccionada}:")
+    st.dataframe(data_filtrada_por_dia)
