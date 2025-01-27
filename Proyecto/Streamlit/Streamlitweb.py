@@ -31,6 +31,10 @@ st.markdown("### Bienvenido a la herramienta de predicción de gases. Selecciona
 def descargar_modelo(url, output_path):
     response = requests.get(url, stream=True)
     if response.status_code == 200:
+        # Verificar si el archivo descargado es HTML
+        if response.text.startswith("<html>"):
+            st.error("El archivo descargado parece ser una página HTML. Verifica la URL del archivo.")
+            return False
         with open(output_path, 'wb') as f:
             for chunk in response.iter_content(1024):
                 f.write(chunk)
