@@ -57,7 +57,7 @@ try:
     response.raise_for_status()
     data = pd.read_csv(StringIO(response.text), sep=';', decimal=',')
     st.write("Datos de muestra:")
-    st.dataframe(data.head(10))
+    st.dataframe(data.tail(10))
 except Exception as e:
     st.error(f"Error al cargar los datos de la estación desde GitHub: {e}")
 
