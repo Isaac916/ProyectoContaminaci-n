@@ -1,14 +1,21 @@
+import os
 import streamlit as st
 import pickle
 import pandas as pd
 
-dataElche = pd.read_csv('C:/Users/javie/Documents/ProyectoIABD25/ProyectoContaminaci-n/Proyecto/Procesamiento/Orihuela-Limpio.csv', sep=';', decimal=',')
+# Obtener la ruta del directorio actual del script
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+# Construir las rutas relativas de los archivos
+ruta_orihuela = os.path.join(BASE_DIR, '../Procesamiento/Orihuela-Limpio.csv')
+ruta_modelo = os.path.join(BASE_DIR, '../MachineLearning/SO2_model.pkl')
+
+# Leer los datos
+dataElche = pd.read_csv(ruta_orihuela, sep=';', decimal=',')
 st.write(dataElche.head(10))
 
-
 # Cargar el modelo desde el archivo pickle
-modelo_filename = 'C:/Users/javie/Documents/ProyectoIABD25/ProyectoContaminaci-n/Proyecto/MachineLearning/SO2_model.pkl'
-with open(modelo_filename, 'rb') as file:
+with open(ruta_modelo, 'rb') as file:
     modelo = pickle.load(file)
 
 # Título de la aplicación
