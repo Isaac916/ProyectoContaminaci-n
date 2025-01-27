@@ -36,9 +36,12 @@ try:
     response.raise_for_status()
     data = pd.read_csv(StringIO(response.text), sep=';', decimal=',')
 
-    # Mostrar datos de muestra
-    st.write("Datos de muestra:")
-    st.dataframe(data.head(10))
+    # Filtrar columnas relevantes
+    columnas_relevantes = ['FECHA', 'HORA', 'NOM_ESTACION', 'SO2', 'CO', 'O3']
+    data = data[columnas_relevantes]
+
+    # Mostrar todos los datos filtrados
+    st.dataframe(data.style.format(precision=2).set_properties(**{'background-color': '#f9f9f9', 'color': '#333', 'border-color': 'black'}))
 
     # Validar que el gas seleccionado esté en las columnas
     if gas_seleccionado not in data.columns:
