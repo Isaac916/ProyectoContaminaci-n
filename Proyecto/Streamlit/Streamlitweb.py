@@ -11,11 +11,11 @@ archivos_csv = {
     2: 'https://raw.githubusercontent.com/Isaac916/ProyectoContaminaci-n/feature/procesamientoDatos/Proyecto/Procesamiento/Torrevieja-Limpio.csv'
 }
 
-# Diccionario de modelos con enlaces crudos a los archivos .pkl
+# Diccionario de modelos con enlaces crudos a los archivos .pkl (URL pública)
 modelos = {   
-    "SO2": 'https://storage.cloud.google.com/almacenamientoproyectocontaminacion/SO2_model.pkl?authuser=1',  # URL pública del modelo en el bucket
-    "CO": 'https://storage.cloud.google.com/almacenamientoproyectocontaminacion/SO2_model.pkl?authuser=1',  # URL pública del modelo CO
-    "O3": 'https://storage.cloud.google.com/almacenamientoproyectocontaminacion/SO2_model.pkl?authuser=1'   # URL pública del modelo O3
+    "SO2": 'https://storage.googleapis.com/almacenamientoproyectocontaminacion/SO2_model.pkl',  # URL pública del modelo en el bucket
+    "CO": 'https://storage.googleapis.com/almacenamientoproyectocontaminacion/SO2_model.pkl',  # URL pública del modelo CO
+    "O3": 'https://storage.googleapis.com/almacenamientoproyectocontaminacion/SO2_model.pkl'   # URL pública del modelo O3
 }
 
 # Estilo de la página
@@ -46,17 +46,22 @@ with st.expander("Ver datos de muestra"):
 
 # Función para descargar el archivo desde Google Cloud Storage utilizando requests
 def descargar_modelo(url, output):
-    response = requests.get(url, stream=True)
+    try:
+        # Intentar obtener el archivo de la URL
+        response = requests.get(url, stream=True)
 
-    # Verificar si la solicitud fue exitosa
-    if response.status_code == 200:
-        with open(output, 'wb') as f:
-            for chunk in response.iter_content(chunk_size=1024):
-                if chunk:
-                    f.write(chunk)
-        return True
-    else:
-        st.error("Error al descargar el modelo.")
+        # Verificar si la solicitud fue exitosa
+        if response.status_code == 200:
+            with open(output, 'wb') as f:
+                for chunk in response.iter_content(chunk_size=1024):
+                    if chunk:
+                        f.write(chunk)
+            return True
+        else:
+            st.error(f"Error al descargar el modelo. Código de error: {response.status_code}")
+            return False
+    except Exception as e:
+        st.error(f"Error al descargar el modelo: {e}")
         return False
 
 # Función para cargar el modelo con caché
