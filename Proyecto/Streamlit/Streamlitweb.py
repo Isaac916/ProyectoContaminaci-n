@@ -1,8 +1,8 @@
+import joblib
 import os
 import streamlit as st
-import pickle
 import pandas as pd
-import requests  # Usaremos requests para la descarga
+import requests
 
 # Diccionario con enlaces directos a los archivos CSV en GitHub (usando raw)
 archivos_csv = {
@@ -13,9 +13,9 @@ archivos_csv = {
 
 # Diccionario de modelos con enlaces crudos a los archivos .pkl
 modelos = {   
-    "SO2": 'https://drive.google.com/uc?id=1IdiOg_3CGe2I0AsZvgX33zxjoV27CSu2',  # Enlace de Google Drive para SO2
-    "CO": 'https://drive.google.com/uc?id=1IdiOg_3CGe2I0AsZvgX33zxjoV27CSu2',  # Cambiar por la URL correspondiente
-    "O3": 'https://drive.google.com/uc?id=1IdiOg_3CGe2I0AsZvgX33zxjoV27CSu2'   # Cambiar por la URL correspondiente
+    "SO2": 'https://storage.cloud.google.com/almacenamientoproyectocontaminacion/SO2_model.pkl?authuser=1',
+    "CO": 'https://storage.cloud.google.com/almacenamientoproyectocontaminacion/CO_model.pkl?authuser=1',
+    "O3": 'https://storage.cloud.google.com/almacenamientoproyectocontaminacion/O3_model.pkl?authuser=1'
 }
 
 # Estilo de la página
@@ -44,26 +44,19 @@ data = pd.read_csv(csv_path, sep=';', decimal=',')
 with st.expander("Ver datos de muestra"):
     st.write(data.head(10))
 
-# Función para descargar el archivo desde Google Drive utilizando requests
+# Función para descargar el archivo desde Google Cloud Storage utilizando requests
 def descargar_modelo(url, output):
-    try:
-        # Hacer una solicitud a Google Drive para obtener el archivo
-        session = requests.Session()
-        response = session.get(url, stream=True)
+    response = requests.get(url, stream=True)
 
-        # Si la respuesta es exitosa
-        if response.status_code == 200:
-            with open(output, 'wb') as f:
-                for chunk in response.iter_content(chunk_size=1024):
-                    if chunk:
-                        f.write(chunk)
-            print("Modelo descargado exitosamente.")
-            return True
-        else:
-            print("Error al descargar el archivo.")
-            return False
-    except Exception as e:
-        print(f"Error de solicitud: {e}")
+    # Verificar si la solicitud fue exitosa
+    if response.status_code == 200:
+        with open(output, 'wb') as f:
+            for chunk in response.iter_content(chunk_size=1024):
+                if chunk:
+                    f.write(chunk)
+        return True
+    else:
+        st.error("Error al descargar el modelo.")
         return False
 
 # Función para cargar el modelo con caché
@@ -71,24 +64,17 @@ def descargar_modelo(url, output):
 def cargar_modelo(url):
     output = 'modelo.pkl'
     if descargar_modelo(url, output):
-        try:
-            with open(output, 'rb') as file:
-                modelo = pickle.load(file)
-            return modelo
-        except Exception as e:
-            st.error(f"Error al cargar el modelo: {e}")
-            return None
+        # Usamos joblib en lugar de pickle
+        import joblib
+        modelo = joblib.load(output)
+        return modelo
     return None
 
 # Cargar el modelo del gas seleccionado desde la URL con caché
 modelo_url = modelos[gas_seleccionado]
 with st.spinner('Cargando el modelo...'):
     modelo = cargar_modelo(modelo_url)
-
-if modelo is None:
-    st.error("Error: El modelo no se pudo cargar. Verifica la URL y el archivo del modelo.")
-else:
-    st.success("Modelo cargado correctamente")
+st.success("Modelo cargado correctamente")
 
 # Inputs del usuario
 st.sidebar.subheader("Parámetros de entrada")
@@ -112,14 +98,11 @@ st.dataframe(X_input)
 
 # Botón para realizar la predicción
 if st.button("Predecir"):
+    # Verificar si el modelo fue cargado correctamente
     if modelo is not None:
         # Realizar la predicción
         prediccion = modelo.predict(X_input)[0]
         st.success(f"El valor predicho para {gas_seleccionado} es: {prediccion:.2f}")
         st.balloons()
     else:
-        st.error("No se puede realizar la predicción porque el modelo no está disponible.")
-
-# Pie de página
-st.markdown("---")
-st.markdown("**Desarrollado por [Isaac Abarca | Javi Gomez | Troy Barker]** • [GitHub](https://github.com/Isaac916/ProyectoContaminaci-n) • © 2025")
+        st.error("No se pudo cargar el modelo.")
