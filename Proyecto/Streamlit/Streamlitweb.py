@@ -4,6 +4,13 @@ import streamlit as st
 import pandas as pd
 import requests
 
+try:
+    import joblib
+except ImportError:
+    import pip
+    pip.main(['install', 'joblib'])  # Instala joblib si no está disponible
+    import joblib
+
 # Diccionario con enlaces directos a los archivos CSV en GitHub (usando raw)
 archivos_csv = {
     0: 'https://raw.githubusercontent.com/Isaac916/ProyectoContaminaci-n/feature/procesamientoDatos/Proyecto/Procesamiento/Elche-Limpio.csv',
