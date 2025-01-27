@@ -8,16 +8,18 @@ import pandas as pd
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # Construir las rutas relativas de los archivos CSV
+# Rutas de los archivos CSV en GitHub
 archivos_csv = {
-    0: os.path.join(BASE_DIR, '../Procesamiento/Elche-Limpio.csv'),
-    1: os.path.join(BASE_DIR, '../Procesamiento/Orihuela-Limpio.csv'),
-    2: os.path.join(BASE_DIR, '../Procesamiento/Torrevieja-Limpio.csv')
+    0: 'https://raw.githubusercontent.com/Isaac916/ProyectoContaminaci-n/main/Procesamiento/Elche-Limpio.csv',
+    1: 'https://raw.githubusercontent.com/Isaac916/ProyectoContaminaci-n/main/Procesamiento/Orihuela-Limpio.csv',
+    2: 'https://raw.githubusercontent.com/Isaac916/ProyectoContaminaci-n/main/Procesamiento/Torrevieja-Limpio.csv'
 }
+
 
 modelos = {
     "SO2": 'https://storage.cloud.google.com/almacenamientoproyectocontaminacion/SO2_model.pkl?authuser=1',
-    "CO": 'https://storage.cloud.google.com/almacenamientoproyectocontaminacion/CO_model.pkl?authuser=1',
-    "O3": 'https://storage.cloud.google.com/almacenamientoproyectocontaminacion/O3_model.pkl?authuser=1'
+    "CO": 'https://storage.cloud.google.com/almacenamientoproyectocontaminacion/SO2_model.pkl?authuser=1',
+    "O3": 'https://storage.cloud.google.com/almacenamientoproyectocontaminacion/SO2_model.pkl?authuser=1'
 }
 
 # Estilo de la página
@@ -64,9 +66,12 @@ modelo_path = f'{gas_seleccionado}_model.pkl'  # Ruta temporal para guardar el a
 
 # Descargar y cargar el modelo
 if descargar_modelo(modelo_url, modelo_path):
-    with open(modelo_path, 'rb') as file:
-        modelo = pickle.load(file)
-    st.success("Modelo cargado correctamente.")
+    try:
+        with open(modelo_path, 'rb') as file:
+            modelo = pickle.load(file)
+        st.success("Modelo cargado correctamente.")
+    except pickle.UnpicklingError:
+        st.error("Hubo un problema al cargar el modelo. El archivo descargado no es válido.")
     
     # Inputs del usuario
     st.sidebar.subheader("Parámetros de entrada")
@@ -90,10 +95,13 @@ if descargar_modelo(modelo_url, modelo_path):
 
     # Botón para realizar la predicción
     if st.button("Predecir"):
-        # Realizar la predicción
-        prediccion = modelo.predict(X_input)[0]
-        st.success(f"El valor predicho para {gas_seleccionado} es: {prediccion:.2f}")
-        st.balloons()
+        if 'modelo' in locals():
+            # Realizar la predicción
+            prediccion = modelo.predict(X_input)[0]
+            st.success(f"El valor predicho para {gas_seleccionado} es: {prediccion:.2f}")
+            st.balloons()
+        else:
+            st.error("Modelo no cargado correctamente, no se puede hacer la predicción.")
 
 else:
     st.error("No se pudo cargar el modelo desde la URL.")
