@@ -2,7 +2,7 @@ import os
 import streamlit as st
 import pickle
 import pandas as pd
-import requests  # Usamos requests para la descarga
+import gdown  # Usaremos gdown para la descarga
 
 # Diccionario con enlaces directos a los archivos CSV en GitHub (usando raw)
 archivos_csv = {
@@ -13,9 +13,9 @@ archivos_csv = {
 
 # Diccionario de modelos con enlaces crudos a los archivos .pkl
 modelos = {   
-    "SO2": 'https://storage.cloud.google.com/almacenamientoproyectocontaminacion/SO2_model.pkl?authuser=1',  # URL pública del modelo en el bucket
-    "CO": 'https://storage.cloud.google.com/almacenamientoproyectocontaminacion/SO2_model.pkl?authuser=1',  # URL pública del modelo CO
-    "O3": 'https://storage.cloud.google.com/almacenamientoproyectocontaminacion/SO2_model.pkl?authuser=1'   # URL pública del modelo O3
+    "SO2": 'https://drive.google.com/uc?id=1IdiOg_3CGe2I0AsZvgX33zxjoV27CSu2',  # Enlace de Google Drive para SO2
+    "CO": 'https://drive.google.com/uc?id=1IdiOg_3CGe2I0AsZvgX33zxjoV27CSu2',  # Cambiar por la URL correspondiente
+    "O3": 'https://drive.google.com/uc?id=1IdiOg_3CGe2I0AsZvgX33zxjoV27CSu2'   # Cambiar por la URL correspondiente
 }
 
 # Estilo de la página
@@ -44,21 +44,12 @@ data = pd.read_csv(csv_path, sep=';', decimal=',')
 with st.expander("Ver datos de muestra"):
     st.write(data.head(10))
 
-# Función para descargar el archivo desde Google Cloud Storage utilizando requests
+# Función para descargar el archivo desde Google Drive utilizando gdown
 def descargar_modelo(url, output):
     try:
-        response = requests.get(url, stream=True)
-        print(f"Status Code: {response.status_code}")  # Verificar el estado de la respuesta
-        if response.status_code == 200:
-            with open(output, 'wb') as f:
-                for chunk in response.iter_content(chunk_size=1024):
-                    if chunk:
-                        f.write(chunk)
-            print("Modelo descargado exitosamente.")
-            return True
-        else:
-            st.error(f"Error al descargar el modelo. Código de error: {response.status_code}")
-            return False
+        gdown.download(url, output, quiet=False)
+        print("Modelo descargado exitosamente.")
+        return True
     except Exception as e:
         st.error(f"Error al descargar el modelo: {e}")
         print(f"Excepción: {e}")
@@ -69,9 +60,13 @@ def descargar_modelo(url, output):
 def cargar_modelo(url):
     output = 'modelo.pkl'
     if descargar_modelo(url, output):
-        with open(output, 'rb') as file:
-            modelo = pickle.load(file)
-        return modelo
+        try:
+            with open(output, 'rb') as file:
+                modelo = pickle.load(file)
+            return modelo
+        except Exception as e:
+            st.error(f"Error al cargar el modelo: {e}")
+            return None
     return None
 
 # Cargar el modelo del gas seleccionado desde la URL con caché
