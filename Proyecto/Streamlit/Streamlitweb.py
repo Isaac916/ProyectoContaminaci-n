@@ -7,25 +7,20 @@ import pandas as pd
 # Obtener la ruta del directorio actual del script
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-# Construir las rutas relativas de los archivos CSV
-# Rutas de los archivos CSV en GitHub
-
 archivos_csv = {
     0: 'https://raw.githubusercontent.com/Isaac916/ProyectoContaminaci-n/feature/procesamientoDatos/Proyecto/Procesamiento/Elche-Limpio.csv',
     1: 'https://raw.githubusercontent.com/Isaac916/ProyectoContaminaci-n/feature/procesamientoDatos/Proyecto/Procesamiento/Orihuela-Limpio.csv',
     2: 'https://raw.githubusercontent.com/Isaac916/ProyectoContaminaci-n/feature/procesamientoDatos/Proyecto/Procesamiento/Torrevieja-Limpio.csv'
 }
 
-
-
+# Rutas de los modelos
 modelos = {
-    "SO2": 'https://storage.cloud.google.com/almacenamientoproyectocontaminacion/SO2_model.pkl?authuser=1',
-    "CO": 'https://storage.cloud.google.com/almacenamientoproyectocontaminacion/SO2_model.pkl?authuser=1',
-    "O3": 'https://storage.cloud.google.com/almacenamientoproyectocontaminacion/SO2_model.pkl?authuser=1'
+    "SO2": 'https://storage.googleapis.com/almacenamientoproyectocontaminacion/SO2_model.pkl?authuser=1',
+    "CO": 'https://storage.googleapis.com/almacenamientoproyectocontaminacion/SO2_model.pkl?authuser=1',
+    "O3": 'https://storage.googleapis.com/almacenamientoproyectocontaminacion/SO2_model.pkl?authuser=1'
 }
- 
 
-# Estilo dedada la página
+# Estilo de la página
 st.set_page_config(page_title="Predicción de Gases", page_icon="⛅", layout="centered")
 
 # Título principal
@@ -36,12 +31,18 @@ st.markdown("### Bienvenido a la herramienta de predicción de gases. Selecciona
 def descargar_modelo(url, output_path):
     # Realizar una solicitud GET para descargar el modelo
     response = requests.get(url)
+    
+    # Verificar si la solicitud fue exitosa
     if response.status_code == 200:
+        # Verificar si no se descargó HTML (lo cual indica que algo salió mal)
+        if response.headers['Content-Type'] == 'text/html':
+            st.error("Hubo un problema al descargar el modelo. La URL puede estar incorrecta.")
+            return False
         with open(output_path, 'wb') as f:
             f.write(response.content)
         return True
     else:
-        st.error("No se pudo descargar el modelo desde la URL.")
+        st.error(f"Error al descargar el archivo. Código de respuesta: {response.status_code}")
         return False
 
 # Selección del gas
@@ -56,7 +57,6 @@ estaciones_codificadas = {"ELX - AGROALIMENTARI": 0, "ORIHUELA": 1, "TORREVIEJA"
 nom_estacion_codificado = estaciones_codificadas[nom_estacion]
 
 # Cargar el archivo CSV de acuerdo a la estación seleccionada
-#gola
 csv_path = archivos_csv[nom_estacion_codificado]
 data = pd.read_csv(csv_path, sep=';', decimal=',')
 
@@ -74,39 +74,36 @@ if descargar_modelo(modelo_url, modelo_path):
         with open(modelo_path, 'rb') as file:
             modelo = pickle.load(file)
         st.success("Modelo cargado correctamente.")
-    except pickle.UnpicklingError:
-        st.error("Hubo un problema al cargar el modelo. El archivo descargado no es válido.")
-    
-    # Inputs del usuario
-    st.sidebar.subheader("Parámetros de entrada")
-    año = st.sidebar.number_input("Año", min_value=2000, max_value=2100, step=1, value=2023)
-    mes = st.sidebar.number_input("Mes", min_value=1, max_value=12, step=1, value=1)
-    dia = st.sidebar.number_input("Día", min_value=1, max_value=31, step=1, value=1)
-    hora = st.sidebar.number_input("Hora", min_value=0, max_value=23, step=1, value=12)
+        
+        # Inputs del usuario
+        st.sidebar.subheader("Parámetros de entrada")
+        año = st.sidebar.number_input("Año", min_value=2000, max_value=2100, step=1, value=2023)
+        mes = st.sidebar.number_input("Mes", min_value=1, max_value=12, step=1, value=1)
+        dia = st.sidebar.number_input("Día", min_value=1, max_value=31, step=1, value=1)
+        hora = st.sidebar.number_input("Hora", min_value=0, max_value=23, step=1, value=12)
 
-    # Crear el DataFrame para la predicción
-    X_input = pd.DataFrame({
-        "año": [año],
-        "mes": [mes],
-        "dia": [dia],
-        "HORA": [hora],
-        "NOM_ESTACION": [nom_estacion_codificado]
-    })
+        # Crear el DataFrame para la predicción
+        X_input = pd.DataFrame({
+            "año": [año],
+            "mes": [mes],
+            "dia": [dia],
+            "HORA": [hora],
+            "NOM_ESTACION": [nom_estacion_codificado]
+        })
 
-    # Mostrar el input en pantalla
-    st.write("### Datos ingresados para la predicción:")
-    st.dataframe(X_input)
+        # Mostrar el input en pantalla
+        st.write("### Datos ingresados para la predicción:")
+        st.dataframe(X_input)
 
-    # Botón para realizar la predicción
-    if st.button("Predecir"):
-        if 'modelo' in locals():
+        # Botón para realizar la predicción
+        if st.button("Predecir"):
             # Realizar la predicción
             prediccion = modelo.predict(X_input)[0]
             st.success(f"El valor predicho para {gas_seleccionado} es: {prediccion:.2f}")
             st.balloons()
-        else:
-            st.error("Modelo no cargado correctamente, no se puede hacer la predicción.")
 
+    except Exception as e:
+        st.error(f"Hubo un problema al cargar el modelo. Detalles del error: {e}")
 else:
     st.error("No se pudo cargar el modelo desde la URL.")
 
