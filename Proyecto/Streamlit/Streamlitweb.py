@@ -2,7 +2,7 @@ import os
 import streamlit as st
 import pickle
 import pandas as pd
-import gdown  # Usaremos gdown para la descarga
+import requests  # Usaremos requests para la descarga
 
 # Diccionario con enlaces directos a los archivos CSV en GitHub (usando raw)
 archivos_csv = {
@@ -44,15 +44,26 @@ data = pd.read_csv(csv_path, sep=';', decimal=',')
 with st.expander("Ver datos de muestra"):
     st.write(data.head(10))
 
-# Función para descargar el archivo desde Google Drive utilizando gdown
+# Función para descargar el archivo desde Google Drive utilizando requests
 def descargar_modelo(url, output):
     try:
-        gdown.download(url, output, quiet=False)
-        print("Modelo descargado exitosamente.")
-        return True
+        # Hacer una solicitud a Google Drive para obtener el archivo
+        session = requests.Session()
+        response = session.get(url, stream=True)
+
+        # Si la respuesta es exitosa
+        if response.status_code == 200:
+            with open(output, 'wb') as f:
+                for chunk in response.iter_content(chunk_size=1024):
+                    if chunk:
+                        f.write(chunk)
+            print("Modelo descargado exitosamente.")
+            return True
+        else:
+            print("Error al descargar el archivo.")
+            return False
     except Exception as e:
-        st.error(f"Error al descargar el modelo: {e}")
-        print(f"Excepción: {e}")
+        print(f"Error de solicitud: {e}")
         return False
 
 # Función para cargar el modelo con caché
