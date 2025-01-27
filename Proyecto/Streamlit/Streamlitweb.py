@@ -67,21 +67,11 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_
 
 # Modelos
 rf_model = RandomForestClassifier()
-lr_model = LogisticRegression(max_iter=1000)
 rf_model.fit(X_train, y_train)
-lr_model.fit(X_train, y_train)
 
 # Evaluación
 rf_predictions = rf_model.predict(X_test)
-lr_predictions = lr_model.predict(X_test)
 rf_accuracy = accuracy_score(y_test, rf_predictions)
-lr_accuracy = accuracy_score(y_test, lr_predictions)
-
-best_model = rf_model if rf_accuracy > lr_accuracy else lr_model
-
-# Mostrar precisión
-st.write(f"Precisión del modelo RandomForest: {rf_accuracy * 100:.2f}%")
-st.write(f"Precisión del modelo LogisticRegression: {lr_accuracy * 100:.2f}%")
 
 # Inputs del usuario
 st.sidebar.subheader("Parámetros de entrada")
@@ -105,7 +95,7 @@ st.dataframe(X_input)
 
 # Predicción
 if st.button("Predecir"):
-    prediction = best_model.predict(X_input)[0]
+    prediction = rf_model.predict(X_input)[0]
     st.success(f"El valor predicho para {gas_seleccionado} es: {prediction:.2f}")
     st.balloons()
 
