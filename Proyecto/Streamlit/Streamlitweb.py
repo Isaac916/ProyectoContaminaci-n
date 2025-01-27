@@ -1,18 +1,16 @@
-import os
 import streamlit as st
 import pickle
 import pandas as pd
-import requests
-from io import StringIO
 from google.cloud import storage
 from google.oauth2 import service_account
+from io import StringIO
 
-# Cargar las credenciales de Google desde Streamlit secrets
+# Configuración de las credenciales de Google Cloud desde los secretos de Streamlit
 google_cloud_credentials = st.secrets["google_cloud"]
-
-# Autenticación con Google Cloud utilizando las credenciales de service account
 credentials = service_account.Credentials.from_service_account_info(google_cloud_credentials)
 storage_client = storage.Client(credentials=credentials, project=google_cloud_credentials["project_id"])
+
+bucket_name = 'almacenamientoproyectocontaminacion'  # Cambia al nombre de tu bucket
 
 # URLs de los archivos
 archivos_csv = {
@@ -40,31 +38,33 @@ gas_seleccionado = st.sidebar.selectbox("Selecciona el gas a predecir", list(mod
 
 # Selección de la estación
 nom_estacion = st.sidebar.selectbox("Nombre de la estación", ["ELX - AGROALIMENTARI", "ORIHUELA", "TORREVIEJA"])
-
-# Convertir la estación a códigos (igual que en el entrenamiento)
 estaciones_codificadas = {"ELX - AGROALIMENTARI": 0, "ORIHUELA": 1, "TORREVIEJA": 2}
 nom_estacion_codificado = estaciones_codificadas[nom_estacion]
 
-# Cargar el archivo CSV de acuerdo a la estación seleccionada desde la URL
-csv_url = archivos_csv[nom_estacion_codificado]
-response = requests.get(csv_url)
-data = pd.read_csv(StringIO(response.text), sep=';', decimal=',')
-    
-# Mostrar una tabla con los primeros datos (opcional)
-with st.expander("Ver datos de muestra"):
-    st.write(data.head(10))
+# Cargar el archivo CSV desde Google Cloud Storage
+csv_blob_name = archivos_csv[nom_estacion_codificado]
 
-# Descargar el modelo seleccionado desde Google Cloud Storage
-bucket_name = 'almacenamientoproyectocontaminacion'  # Cambia al nombre correcto de tu bucket
+try:
+    bucket = storage_client.bucket(bucket_name)
+    blob = bucket.blob(csv_blob_name)
+    csv_content = blob.download_as_text()
+    data = pd.read_csv(StringIO(csv_content), sep=';', decimal=',')
+    st.write("### Datos de la estación seleccionada:")
+    st.dataframe(data.head(10))
+except Exception as e:
+    st.error(f"Error al cargar los datos del CSV: {e}")
+
+# Descargar el modelo desde Google Cloud Storage
 model_blob_name = modelos[gas_seleccionado]
 
-bucket = storage_client.bucket(bucket_name)
-blob = bucket.blob(model_blob_name)
-blob.download_to_filename("model.pkl")
-
-# Cargar el modelo con pickle
-with open("model.pkl", 'rb') as file:
-    modelo = pickle.load(file)
+try:
+    blob = bucket.blob(model_blob_name)
+    blob.download_to_filename("model.pkl")
+    with open("model.pkl", 'rb') as file:
+        modelo = pickle.load(file)
+    st.write("Modelo cargado correctamente.")
+except Exception as e:
+    st.error(f"Error al cargar el modelo: {e}")
 
 # Inputs del usuario
 st.sidebar.subheader("Parámetros de entrada")
@@ -88,10 +88,13 @@ st.dataframe(X_input)
 
 # Botón para realizar la predicción
 if st.button("Predecir"):
-    # Realizar la predicción
-    prediccion = modelo.predict(X_input)[0]
-    st.success(f"El valor predicho para {gas_seleccionado} es: {prediccion:.2f}")
-    st.balloons()
+    try:
+        # Realizar la predicción
+        prediccion = modelo.predict(X_input)[0]
+        st.success(f"El valor predicho para {gas_seleccionado} es: {prediccion:.2f}")
+        st.balloons()
+    except Exception as e:
+        st.error(f"Error al realizar la predicción: {e}")
 
 # Pie de página
 st.markdown("---")
