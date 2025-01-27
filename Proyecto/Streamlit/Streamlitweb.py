@@ -2,9 +2,8 @@ import os
 import requests
 import streamlit as st
 import pandas as pd
+import joblib  # Importar joblib para cargar el modelo
 from sklearn.model_selection import train_test_split
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score
 
 # Archivos CSV
@@ -40,38 +39,16 @@ data = pd.read_csv(csv_path, sep=';', decimal=',')
 with st.expander("Ver datos de muestra"):
     st.write(data.head(10))
 
-# Entrenamiento del modelo
-# Preprocesamiento similar al del código original
-df_combined = pd.concat([
-    pd.read_csv('https://raw.githubusercontent.com/Isaac916/ProyectoContaminaci-n/feature/procesamientoDatos/Proyecto/Procesamiento/Elche-Limpio.csv', sep=';'),
-    pd.read_csv('https://raw.githubusercontent.com/Isaac916/ProyectoContaminaci-n/feature/procesamientoDatos/Proyecto/Procesamiento/Orihuela-Limpio.csv', sep=';'),
-    pd.read_csv('https://raw.githubusercontent.com/Isaac916/ProyectoContaminaci-n/feature/procesamientoDatos/Proyecto/Procesamiento/Torrevieja-Limpio.csv', sep=';')
-], ignore_index=True)
+# Cargar el modelo preentrenado desde la URL pública
+url_modelo = "https://storage.cloud.google.com/almacenamientoproyectocontaminacion/SO2_model.pkl?authuser=1"
+response = requests.get(url_modelo)
 
-# Procesar fechas y eliminar filas nulas
-df_combined['FECHA'] = pd.to_datetime(df_combined['FECHA'], errors='coerce')
-df_combined['año'] = df_combined['FECHA'].dt.year
-df_combined['mes'] = df_combined['FECHA'].dt.month
-df_combined['dia'] = df_combined['FECHA'].dt.day
-columns_to_keep = ['año', 'mes', 'dia', 'HORA', 'NOM_ESTACION', gas_seleccionado]
-df_combined = df_combined[columns_to_keep]
-df_combined.dropna(subset=[gas_seleccionado], inplace=True)
+# Guardar el archivo .pkl en el sistema local temporalmente
+with open("/tmp/SO2_model.pkl", "wb") as f:
+    f.write(response.content)
 
-# Convertir columnas categóricas a números
-df_combined = df_combined.apply(lambda col: col.astype('category').cat.codes if col.dtypes == 'object' else col)
-
-# Preparar datos para entrenamiento
-X = df_combined.drop([gas_seleccionado], axis=1)
-y = df_combined[gas_seleccionado]
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=0)
-
-# Modelos
-rf_model = RandomForestClassifier()
-rf_model.fit(X_train, y_train)
-
-# Evaluación
-rf_predictions = rf_model.predict(X_test)
-rf_accuracy = accuracy_score(y_test, rf_predictions)
+# Cargar el modelo desde el archivo .pkl
+modelo = joblib.load("/tmp/SO2_model.pkl")
 
 # Inputs del usuario
 st.sidebar.subheader("Parámetros de entrada")
@@ -95,7 +72,7 @@ st.dataframe(X_input)
 
 # Predicción
 if st.button("Predecir"):
-    prediction = rf_model.predict(X_input)[0]
+    prediction = modelo.predict(X_input)[0]
     st.success(f"El valor predicho para {gas_seleccionado} es: {prediction:.2f}")
     st.balloons()
 
