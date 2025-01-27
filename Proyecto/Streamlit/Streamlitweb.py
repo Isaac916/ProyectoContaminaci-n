@@ -1,16 +1,21 @@
 import os
-import requests
 import streamlit as st
+import pickle
 import pandas as pd
-import joblib  # Importar joblib para cargar el modelo
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score
+import requests
+from io import StringIO
 
-# Archivos CSV
+# URLs de los archivos
 archivos_csv = {
     0: 'https://raw.githubusercontent.com/Isaac916/ProyectoContaminaci-n/feature/procesamientoDatos/Proyecto/Procesamiento/Elche-Limpio.csv',
     1: 'https://raw.githubusercontent.com/Isaac916/ProyectoContaminaci-n/feature/procesamientoDatos/Proyecto/Procesamiento/Orihuela-Limpio.csv',
     2: 'https://raw.githubusercontent.com/Isaac916/ProyectoContaminaci-n/feature/procesamientoDatos/Proyecto/Procesamiento/Torrevieja-Limpio.csv'
+}
+
+modelos = {
+    "SO2": 'https://storage.cloud.google.com/almacenamientoproyectocontaminacion/SO2_model.pkl?authuser=1',
+    "CO": 'https://storage.cloud.google.com/almacenamientoproyectocontaminacion/SO2_model.pkl?authuser=1',
+    "O3": 'https://storage.cloud.google.com/almacenamientoproyectocontaminacion/SO2_model.pkl?authuser=1'
 }
 
 # Estilo de la página
@@ -22,7 +27,7 @@ st.markdown("### Bienvenido a la herramienta de predicción de gases. Selecciona
 
 # Selección del gas
 st.sidebar.header("Configuración de Predicción")
-gas_seleccionado = st.sidebar.selectbox("Selecciona el gas a predecir", ["SO2", "CO", "O3"])
+gas_seleccionado = st.sidebar.selectbox("Selecciona el gas a predecir", list(modelos.keys()))
 
 # Selección de la estación
 nom_estacion = st.sidebar.selectbox("Nombre de la estación", ["ELX - AGROALIMENTARI", "ORIHUELA", "TORREVIEJA"])
@@ -31,24 +36,25 @@ nom_estacion = st.sidebar.selectbox("Nombre de la estación", ["ELX - AGROALIMEN
 estaciones_codificadas = {"ELX - AGROALIMENTARI": 0, "ORIHUELA": 1, "TORREVIEJA": 2}
 nom_estacion_codificado = estaciones_codificadas[nom_estacion]
 
-# Cargar el archivo CSV de acuerdo a la estación seleccionada
-csv_path = archivos_csv[nom_estacion_codificado]
-data = pd.read_csv(csv_path, sep=';', decimal=',')
+# Cargar el archivo CSV de acuerdo a la estación seleccionada desde la URL
+csv_url = archivos_csv[nom_estacion_codificado]
+response = requests.get(csv_url)
+data = pd.read_csv(StringIO(response.text), sep=';', decimal=',')
 
 # Mostrar una tabla con los primeros datos (opcional)
 with st.expander("Ver datos de muestra"):
     st.write(data.head(10))
 
-# Cargar el modelo preentrenado desde la URL pública
-url_modelo = "https://storage.cloud.google.com/almacenamientoproyectocontaminacion/SO2_model.pkl?authuser=1"
-response = requests.get(url_modelo)
+# Cargar el modelo del gas seleccionado desde la URL
+modelo_url = modelos[gas_seleccionado]
+response_model = requests.get(modelo_url, stream=True)
+with open("model.pkl", "wb") as f:
+    for chunk in response_model.iter_content(chunk_size=128):
+        f.write(chunk)
 
-# Guardar el archivo .pkl en el sistema local temporalmente
-with open("/tmp/SO2_model.pkl", "wb") as f:
-    f.write(response.content)
-
-# Cargar el modelo desde el archivo .pkl
-modelo = joblib.load("/tmp/SO2_model.pkl")
+# Cargar el modelo con pickle
+with open("model.pkl", 'rb') as file:
+    modelo = pickle.load(file)
 
 # Inputs del usuario
 st.sidebar.subheader("Parámetros de entrada")
@@ -66,14 +72,15 @@ X_input = pd.DataFrame({
     "NOM_ESTACION": [nom_estacion_codificado]
 })
 
-# Mostrar los datos ingresados
+# Mostrar el input en pantalla
 st.write("### Datos ingresados para la predicción:")
 st.dataframe(X_input)
 
-# Predicción
+# Botón para realizar la predicción
 if st.button("Predecir"):
-    prediction = modelo.predict(X_input)[0]
-    st.success(f"El valor predicho para {gas_seleccionado} es: {prediction:.2f}")
+    # Realizar la predicción
+    prediccion = modelo.predict(X_input)[0]
+    st.success(f"El valor predicho para {gas_seleccionado} es: {prediccion:.2f}")
     st.balloons()
 
 # Pie de página
