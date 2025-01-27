@@ -49,12 +49,22 @@ modelo_url = modelos[gas_seleccionado]
 
 # Descargar el modelo usando requests y cargarlo
 response = requests.get(modelo_url)
-with open('modelo.pkl', 'wb') as f:
-    f.write(response.content)
 
-# Cargar el modelo desde el archivo descargado
-with open('modelo.pkl', 'rb') as file:
-    modelo = pickle.load(file)
+# Verificar si la descarga fue exitosa
+if response.status_code == 200:
+    with open('modelo.pkl', 'wb') as f:
+        f.write(response.content)
+
+    # Cargar el modelo desde el archivo descargado
+    try:
+        with open('modelo.pkl', 'rb') as file:
+            modelo = pickle.load(file)
+    except Exception as e:
+        st.error(f"Error al cargar el modelo: {e}")
+        st.stop()
+else:
+    st.error("No se pudo descargar el archivo del modelo. Verifica la URL y vuelve a intentarlo.")
+    st.stop()
 
 # Inputs del usuario
 st.sidebar.subheader("Parámetros de entrada")
@@ -79,9 +89,12 @@ st.dataframe(X_input)
 # Botón para realizar la predicción
 if st.button("Predecir"):
     # Realizar la predicción
-    prediccion = modelo.predict(X_input)[0]
-    st.success(f"El valor predicho para {gas_seleccionado} es: {prediccion:.2f}")
-    st.balloons()
+    try:
+        prediccion = modelo.predict(X_input)[0]
+        st.success(f"El valor predicho para {gas_seleccionado} es: {prediccion:.2f}")
+        st.balloons()
+    except Exception as e:
+        st.error(f"Error al realizar la predicción: {e}")
 
 # Pie de página
 st.markdown("---")
