@@ -3,3 +3,5 @@ streamlit
 plotly
 joblib
 scikit-learn
+google.oauth2
+google.cloud
