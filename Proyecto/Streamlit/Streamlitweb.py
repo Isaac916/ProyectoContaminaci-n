@@ -2,9 +2,10 @@ import os
 import streamlit as st
 import pickle
 import pandas as pd
-import requests
 
-# Diccionario con enlaces directos a los archivos CSV en GitHub (usando raw)
+# Obtener la ruta del directorio actual del script
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
 archivos_csv = {
     0: 'https://raw.githubusercontent.com/Isaac916/ProyectoContaminaci-n/feature/procesamientoDatos/Proyecto/Procesamiento/Elche-Limpio.csv',
     1: 'https://raw.githubusercontent.com/Isaac916/ProyectoContaminaci-n/feature/procesamientoDatos/Proyecto/Procesamiento/Orihuela-Limpio.csv',
@@ -17,6 +18,7 @@ modelos = {
     "CO": 'https://storage.cloud.google.com/almacenamientoproyectocontaminacion/SO2_model.pkl?authuser=1',
     "O3": 'https://storage.cloud.google.com/almacenamientoproyectocontaminacion/SO2_model.pkl?authuser=1'
 }
+
 
 # Estilo de la página
 st.set_page_config(page_title="Predicción de Gases", page_icon="⛅", layout="centered")
@@ -44,37 +46,10 @@ data = pd.read_csv(csv_path, sep=';', decimal=',')
 with st.expander("Ver datos de muestra"):
     st.write(data.head(10))
 
-# Función para descargar el archivo desde Google Cloud Storage utilizando requests
-def descargar_modelo(url, output):
-    response = requests.get(url, stream=True)
-
-    # Verificar si la solicitud fue exitosa
-    if response.status_code == 200:
-        with open(output, 'wb') as f:
-            for chunk in response.iter_content(chunk_size=1024):
-                if chunk:
-                    f.write(chunk)
-        return True
-    else:
-        st.error("Error al descargar el modelo.")
-        return False
-
-# Función para cargar el modelo con caché
-@st.cache_resource
-def cargar_modelo(url):
-    output = 'modelo.pkl'
-    if descargar_modelo(url, output):
-        # Usamos joblib en lugar de pickle
-        import joblib
-        modelo = joblib.load(output)
-        return modelo
-    return None
-
-# Cargar el modelo del gas seleccionado desde la URL con caché
-modelo_url = modelos[gas_seleccionado]
-with st.spinner('Cargando el modelo...'):
-    modelo = cargar_modelo(modelo_url)
-st.success("Modelo cargado correctamente")
+# Cargar el modelo del gas seleccionado usando pickle
+modelo_path = modelos[gas_seleccionado]
+with open(modelo_path, 'rb') as file:
+    modelo = pickle.load(file)
 
 # Inputs del usuario
 st.sidebar.subheader("Parámetros de entrada")
@@ -98,14 +73,10 @@ st.dataframe(X_input)
 
 # Botón para realizar la predicción
 if st.button("Predecir"):
-    # Verificar si el modelo fue cargado correctamente
-    if modelo is not None:
-        # Realizar la predicción
-        prediccion = modelo.predict(X_input)[0]
-        st.success(f"El valor predicho para {gas_seleccionado} es: {prediccion:.2f}")
-        st.balloons()
-    else:
-        st.error("No se pudo cargar el modelo.")
+    # Realizar la predicción
+    prediccion = modelo.predict(X_input)[0]
+    st.success(f"El valor predicho para {gas_seleccionado} es: {prediccion:.2f}")
+    st.balloons()
 
 # Pie de página
 st.markdown("---")
