@@ -4,6 +4,15 @@ import pickle
 import pandas as pd
 import requests
 from io import StringIO
+from google.cloud import storage
+from google.oauth2 import service_account
+
+# Cargar las credenciales de Google desde Streamlit secrets
+google_cloud_credentials = st.secrets["google_cloud"]
+
+# Autenticación con Google Cloud utilizando las credenciales de service account
+credentials = service_account.Credentials.from_service_account_info(google_cloud_credentials)
+storage_client = storage.Client(credentials=credentials, project=google_cloud_credentials["project_id"])
 
 # URLs de los archivos
 archivos_csv = {
@@ -13,9 +22,9 @@ archivos_csv = {
 }
 
 modelos = {
-    "SO2": 'https://storage.cloud.google.com/almacenamientoproyectocontaminacion/SO2_model.pkl?authuser=1',
-    "CO": 'https://storage.cloud.google.com/almacenamientoproyectocontaminacion/SO2_model.pkl?authuser=1',
-    "O3": 'https://storage.cloud.google.com/almacenamientoproyectocontaminacion/SO2_model.pkl?authuser=1'
+    "SO2": 'SO2_model.pkl',
+    "CO": 'CO_model.pkl',
+    "O3": 'O3_model.pkl'
 }
 
 # Estilo de la página
@@ -40,17 +49,18 @@ nom_estacion_codificado = estaciones_codificadas[nom_estacion]
 csv_url = archivos_csv[nom_estacion_codificado]
 response = requests.get(csv_url)
 data = pd.read_csv(StringIO(response.text), sep=';', decimal=',')
-
+    
 # Mostrar una tabla con los primeros datos (opcional)
 with st.expander("Ver datos de muestra"):
     st.write(data.head(10))
 
-# Cargar el modelo del gas seleccionado desde la URL
-modelo_url = modelos[gas_seleccionado]
-response_model = requests.get(modelo_url, stream=True)
-with open("model.pkl", "wb") as f:
-    for chunk in response_model.iter_content(chunk_size=128):
-        f.write(chunk)
+# Descargar el modelo seleccionado desde Google Cloud Storage
+bucket_name = 'almacenamientoproyectocontaminacion'  # Cambia al nombre correcto de tu bucket
+model_blob_name = modelos[gas_seleccionado]
+
+bucket = storage_client.bucket(bucket_name)
+blob = bucket.blob(model_blob_name)
+blob.download_to_filename("model.pkl")
 
 # Cargar el modelo con pickle
 with open("model.pkl", 'rb') as file:
