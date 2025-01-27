@@ -1,0 +1,306 @@
+[
+    {
+        "label": "InsecureClient",
+        "importPath": "hdfs",
+        "description": "hdfs",
+        "isExtraImport": true,
+        "detail": "hdfs",
+        "documentation": {}
+    },
+    {
+        "label": "os",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "os",
+        "description": "os",
+        "detail": "os",
+        "documentation": {}
+    },
+    {
+        "label": "streamlit",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "streamlit",
+        "description": "streamlit",
+        "detail": "streamlit",
+        "documentation": {}
+    },
+    {
+        "label": "pickle",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "pickle",
+        "description": "pickle",
+        "detail": "pickle",
+        "documentation": {}
+    },
+    {
+        "label": "pandas",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "pandas",
+        "description": "pandas",
+        "detail": "pandas",
+        "documentation": {}
+    },
+    {
+        "label": "requests",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "requests",
+        "description": "requests",
+        "detail": "requests",
+        "documentation": {}
+    },
+    {
+        "label": "StringIO",
+        "importPath": "io",
+        "description": "io",
+        "isExtraImport": true,
+        "detail": "io",
+        "documentation": {}
+    },
+    {
+        "label": "plotly.express",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "plotly.express",
+        "description": "plotly.express",
+        "detail": "plotly.express",
+        "documentation": {}
+    },
+    {
+        "label": "markdown_content",
+        "kind": 5,
+        "importPath": "Parametros.Parametros",
+        "description": "Parametros.Parametros",
+        "peekOfCode": "markdown_content = \"\"\"\n| Componente | Explicación | Valores Promedios Recomendados |\n|------------|-------------|-------------------------------|\n| **NOx** | Óxidos de nitrógeno, compuestos que incluyen NO (óxido nítrico) y NO₂ (dióxido de nitrógeno). | Concentraciones horarias no superiores a 200 µg/m³ más de 18 veces al año. |\n| **CO** | Monóxido de carbono, gas producido por la combustión incompleta de carbono. | Concentraciones horarias no superiores a 10 mg/m³ más de 18 veces al año. |\n| **SO₂** | Dióxido de azufre, gas emitido principalmente por la quema de combustibles fósiles. | Concentraciones horarias no superiores a 350 µg/m³ más de 24 veces al año. |\n| **NO** | Óxido nítrico, un componente principal de los NOx. | No hay valores límite específicos; se regula como parte de los NOx. |\n| **NO₂** | Dióxido de nitrógeno, otro componente de los NOx. | Concentraciones horarias no superiores a 200 µg/m³ más de 18 veces al año. |\n| **O₃** | Ozono, gas presente en la atmósfera que puede ser tanto beneficioso (en la estratósfera) como dañino (en la troposfera). | Concentraciones horarias no superiores a 180 µg/m³ más de 18 veces al año. |\n| **PM₁₀** | Partículas en suspensión con un diámetro menor a 10 micrómetros, causantes de problemas respiratorios. | Concentraciones diarias no superiores a 50 µg/m³ más de 35 veces al año. |",
+        "detail": "Parametros.Parametros",
+        "documentation": {}
+    },
+    {
+        "label": "file_path",
+        "kind": 5,
+        "importPath": "Parametros.Parametros",
+        "description": "Parametros.Parametros",
+        "peekOfCode": "file_path = 'calidad_aire.md'\nwith open(file_path, 'w', encoding='utf-8') as f:\n    f.write(markdown_content)",
+        "detail": "Parametros.Parametros",
+        "documentation": {}
+    },
+    {
+        "label": "HDFS_URL",
+        "kind": 5,
+        "importPath": "Procesamiento.subirjsonhadoop",
+        "description": "Procesamiento.subirjsonhadoop",
+        "peekOfCode": "HDFS_URL = 'http://namenode:50070'  # Cambia 'namenode:50070' por la URL de tu Namenode\nHDFS_DIR = '/user/tu_usuario/json_files/'  # Ruta HDFS donde subirás los JSON\n# Inicializa el cliente\nclient = InsecureClient(HDFS_URL, user='tu_usuario')  # Cambia 'tu_usuario' por tu usuario de HDFS\n# Lista de archivos JSON a subir\nlocal_json_files = ['Elche-LIMPIO.json', 'Torrevieja-LIMPIO.json', 'Orihuela-LIMPIO.json']\n# Crea el directorio en HDFS si no existe\nclient.makedirs(HDFS_DIR)\n# Sube los archivos a HDFS\nfor local_file in local_json_files:",
+        "detail": "Procesamiento.subirjsonhadoop",
+        "documentation": {}
+    },
+    {
+        "label": "HDFS_DIR",
+        "kind": 5,
+        "importPath": "Procesamiento.subirjsonhadoop",
+        "description": "Procesamiento.subirjsonhadoop",
+        "peekOfCode": "HDFS_DIR = '/user/tu_usuario/json_files/'  # Ruta HDFS donde subirás los JSON\n# Inicializa el cliente\nclient = InsecureClient(HDFS_URL, user='tu_usuario')  # Cambia 'tu_usuario' por tu usuario de HDFS\n# Lista de archivos JSON a subir\nlocal_json_files = ['Elche-LIMPIO.json', 'Torrevieja-LIMPIO.json', 'Orihuela-LIMPIO.json']\n# Crea el directorio en HDFS si no existe\nclient.makedirs(HDFS_DIR)\n# Sube los archivos a HDFS\nfor local_file in local_json_files:\n    hdfs_path = HDFS_DIR + local_file  # Ruta completa en HDFS",
+        "detail": "Procesamiento.subirjsonhadoop",
+        "documentation": {}
+    },
+    {
+        "label": "client",
+        "kind": 5,
+        "importPath": "Procesamiento.subirjsonhadoop",
+        "description": "Procesamiento.subirjsonhadoop",
+        "peekOfCode": "client = InsecureClient(HDFS_URL, user='tu_usuario')  # Cambia 'tu_usuario' por tu usuario de HDFS\n# Lista de archivos JSON a subir\nlocal_json_files = ['Elche-LIMPIO.json', 'Torrevieja-LIMPIO.json', 'Orihuela-LIMPIO.json']\n# Crea el directorio en HDFS si no existe\nclient.makedirs(HDFS_DIR)\n# Sube los archivos a HDFS\nfor local_file in local_json_files:\n    hdfs_path = HDFS_DIR + local_file  # Ruta completa en HDFS\n    try:\n        print(f'Subiendo {local_file} a {hdfs_path}...')",
+        "detail": "Procesamiento.subirjsonhadoop",
+        "documentation": {}
+    },
+    {
+        "label": "local_json_files",
+        "kind": 5,
+        "importPath": "Procesamiento.subirjsonhadoop",
+        "description": "Procesamiento.subirjsonhadoop",
+        "peekOfCode": "local_json_files = ['Elche-LIMPIO.json', 'Torrevieja-LIMPIO.json', 'Orihuela-LIMPIO.json']\n# Crea el directorio en HDFS si no existe\nclient.makedirs(HDFS_DIR)\n# Sube los archivos a HDFS\nfor local_file in local_json_files:\n    hdfs_path = HDFS_DIR + local_file  # Ruta completa en HDFS\n    try:\n        print(f'Subiendo {local_file} a {hdfs_path}...')\n        with open(local_file, 'rb') as f:\n            client.write(hdfs_path, f, overwrite=True)",
+        "detail": "Procesamiento.subirjsonhadoop",
+        "documentation": {}
+    },
+    {
+        "label": "BASE_DIR",
+        "kind": 5,
+        "importPath": "Streamlit.StreamLit",
+        "description": "Streamlit.StreamLit",
+        "peekOfCode": "BASE_DIR = os.path.dirname(os.path.abspath(__file__))\n# Construir las rutas relativas de los archivos\narchivos_csv = {\n    0: os.path.join(BASE_DIR, '../Procesamiento/Elche-Limpio.csv'),\n    1: os.path.join(BASE_DIR, '../Procesamiento/Orihuela-Limpio.csv'),\n    2: os.path.join(BASE_DIR, '../Procesamiento/Torrevieja-Limpio.csv')\n}\nmodelos = {\n    \"SO2\": os.path.join(BASE_DIR, '../MachineLearning/SO2_model.pkl'),\n    \"CO\": os.path.join(BASE_DIR, '../MachineLearning/CO_model.pkl'),",
+        "detail": "Streamlit.StreamLit",
+        "documentation": {}
+    },
+    {
+        "label": "archivos_csv",
+        "kind": 5,
+        "importPath": "Streamlit.StreamLit",
+        "description": "Streamlit.StreamLit",
+        "peekOfCode": "archivos_csv = {\n    0: os.path.join(BASE_DIR, '../Procesamiento/Elche-Limpio.csv'),\n    1: os.path.join(BASE_DIR, '../Procesamiento/Orihuela-Limpio.csv'),\n    2: os.path.join(BASE_DIR, '../Procesamiento/Torrevieja-Limpio.csv')\n}\nmodelos = {\n    \"SO2\": os.path.join(BASE_DIR, '../MachineLearning/SO2_model.pkl'),\n    \"CO\": os.path.join(BASE_DIR, '../MachineLearning/CO_model.pkl'),\n    \"O3\": os.path.join(BASE_DIR, '../MachineLearning/O3_model.pkl')\n}",
+        "detail": "Streamlit.StreamLit",
+        "documentation": {}
+    },
+    {
+        "label": "modelos",
+        "kind": 5,
+        "importPath": "Streamlit.StreamLit",
+        "description": "Streamlit.StreamLit",
+        "peekOfCode": "modelos = {\n    \"SO2\": os.path.join(BASE_DIR, '../MachineLearning/SO2_model.pkl'),\n    \"CO\": os.path.join(BASE_DIR, '../MachineLearning/CO_model.pkl'),\n    \"O3\": os.path.join(BASE_DIR, '../MachineLearning/O3_model.pkl')\n}\n# Estilo de la página\nst.set_page_config(page_title=\"Predicción de Gases\", page_icon=\"⛅\", layout=\"centered\")\n# Título principal\nst.title(\"⛅ Predicción de Gases Contaminantes ⛅\")\nst.markdown(\"### Bienvenido a la herramienta de predicción de gases. Selecciona el gas y proporciona los parámetros necesarios para obtener la predicción.\")",
+        "detail": "Streamlit.StreamLit",
+        "documentation": {}
+    },
+    {
+        "label": "gas_seleccionado",
+        "kind": 5,
+        "importPath": "Streamlit.StreamLit",
+        "description": "Streamlit.StreamLit",
+        "peekOfCode": "gas_seleccionado = st.sidebar.selectbox(\"Selecciona el gas a predecir\", list(modelos.keys()))\n# Selección de la estación\nnom_estacion = st.sidebar.selectbox(\"Nombre de la estación\", [\"ELX - AGROALIMENTARI\", \"ORIHUELA\", \"TORREVIEJA\"])\n# Convertir la estación a códigos (igual que en el entrenamiento)\nestaciones_codificadas = {\"ELX - AGROALIMENTARI\": 0, \"ORIHUELA\": 1, \"TORREVIEJA\": 2}\nnom_estacion_codificado = estaciones_codificadas[nom_estacion]\n# Cargar el archivo CSV de acuerdo a la estación seleccionada\ncsv_path = archivos_csv[nom_estacion_codificado]\ndata = pd.read_csv(csv_path, sep=';', decimal=',')\n# Mostrar una tabla con los primeros datos (opcional)",
+        "detail": "Streamlit.StreamLit",
+        "documentation": {}
+    },
+    {
+        "label": "nom_estacion",
+        "kind": 5,
+        "importPath": "Streamlit.StreamLit",
+        "description": "Streamlit.StreamLit",
+        "peekOfCode": "nom_estacion = st.sidebar.selectbox(\"Nombre de la estación\", [\"ELX - AGROALIMENTARI\", \"ORIHUELA\", \"TORREVIEJA\"])\n# Convertir la estación a códigos (igual que en el entrenamiento)\nestaciones_codificadas = {\"ELX - AGROALIMENTARI\": 0, \"ORIHUELA\": 1, \"TORREVIEJA\": 2}\nnom_estacion_codificado = estaciones_codificadas[nom_estacion]\n# Cargar el archivo CSV de acuerdo a la estación seleccionada\ncsv_path = archivos_csv[nom_estacion_codificado]\ndata = pd.read_csv(csv_path, sep=';', decimal=',')\n# Mostrar una tabla con los primeros datos (opcional)\nwith st.expander(\"Ver datos de muestra\"):\n    st.write(data.head(10))",
+        "detail": "Streamlit.StreamLit",
+        "documentation": {}
+    },
+    {
+        "label": "estaciones_codificadas",
+        "kind": 5,
+        "importPath": "Streamlit.StreamLit",
+        "description": "Streamlit.StreamLit",
+        "peekOfCode": "estaciones_codificadas = {\"ELX - AGROALIMENTARI\": 0, \"ORIHUELA\": 1, \"TORREVIEJA\": 2}\nnom_estacion_codificado = estaciones_codificadas[nom_estacion]\n# Cargar el archivo CSV de acuerdo a la estación seleccionada\ncsv_path = archivos_csv[nom_estacion_codificado]\ndata = pd.read_csv(csv_path, sep=';', decimal=',')\n# Mostrar una tabla con los primeros datos (opcional)\nwith st.expander(\"Ver datos de muestra\"):\n    st.write(data.head(10))\n# Cargar el modelo del gas seleccionado\nmodelo_path = modelos[gas_seleccionado]",
+        "detail": "Streamlit.StreamLit",
+        "documentation": {}
+    },
+    {
+        "label": "nom_estacion_codificado",
+        "kind": 5,
+        "importPath": "Streamlit.StreamLit",
+        "description": "Streamlit.StreamLit",
+        "peekOfCode": "nom_estacion_codificado = estaciones_codificadas[nom_estacion]\n# Cargar el archivo CSV de acuerdo a la estación seleccionada\ncsv_path = archivos_csv[nom_estacion_codificado]\ndata = pd.read_csv(csv_path, sep=';', decimal=',')\n# Mostrar una tabla con los primeros datos (opcional)\nwith st.expander(\"Ver datos de muestra\"):\n    st.write(data.head(10))\n# Cargar el modelo del gas seleccionado\nmodelo_path = modelos[gas_seleccionado]\nwith open(modelo_path, 'rb') as file:",
+        "detail": "Streamlit.StreamLit",
+        "documentation": {}
+    },
+    {
+        "label": "csv_path",
+        "kind": 5,
+        "importPath": "Streamlit.StreamLit",
+        "description": "Streamlit.StreamLit",
+        "peekOfCode": "csv_path = archivos_csv[nom_estacion_codificado]\ndata = pd.read_csv(csv_path, sep=';', decimal=',')\n# Mostrar una tabla con los primeros datos (opcional)\nwith st.expander(\"Ver datos de muestra\"):\n    st.write(data.head(10))\n# Cargar el modelo del gas seleccionado\nmodelo_path = modelos[gas_seleccionado]\nwith open(modelo_path, 'rb') as file:\n    modelo = pickle.load(file)\n# Inputs del usuario",
+        "detail": "Streamlit.StreamLit",
+        "documentation": {}
+    },
+    {
+        "label": "data",
+        "kind": 5,
+        "importPath": "Streamlit.StreamLit",
+        "description": "Streamlit.StreamLit",
+        "peekOfCode": "data = pd.read_csv(csv_path, sep=';', decimal=',')\n# Mostrar una tabla con los primeros datos (opcional)\nwith st.expander(\"Ver datos de muestra\"):\n    st.write(data.head(10))\n# Cargar el modelo del gas seleccionado\nmodelo_path = modelos[gas_seleccionado]\nwith open(modelo_path, 'rb') as file:\n    modelo = pickle.load(file)\n# Inputs del usuario\nst.sidebar.subheader(\"Parámetros de entrada\")",
+        "detail": "Streamlit.StreamLit",
+        "documentation": {}
+    },
+    {
+        "label": "modelo_path",
+        "kind": 5,
+        "importPath": "Streamlit.StreamLit",
+        "description": "Streamlit.StreamLit",
+        "peekOfCode": "modelo_path = modelos[gas_seleccionado]\nwith open(modelo_path, 'rb') as file:\n    modelo = pickle.load(file)\n# Inputs del usuario\nst.sidebar.subheader(\"Parámetros de entrada\")\naño = st.sidebar.number_input(\"Año\", min_value=2000, max_value=2100, step=1, value=2023)\nmes = st.sidebar.number_input(\"Mes\", min_value=1, max_value=12, step=1, value=1)\ndia = st.sidebar.number_input(\"Día\", min_value=1, max_value=31, step=1, value=1)\nhora = st.sidebar.number_input(\"Hora\", min_value=0, max_value=23, step=1, value=12)\n# Crear el DataFrame para la predicción",
+        "detail": "Streamlit.StreamLit",
+        "documentation": {}
+    },
+    {
+        "label": "año",
+        "kind": 5,
+        "importPath": "Streamlit.StreamLit",
+        "description": "Streamlit.StreamLit",
+        "peekOfCode": "año = st.sidebar.number_input(\"Año\", min_value=2000, max_value=2100, step=1, value=2023)\nmes = st.sidebar.number_input(\"Mes\", min_value=1, max_value=12, step=1, value=1)\ndia = st.sidebar.number_input(\"Día\", min_value=1, max_value=31, step=1, value=1)\nhora = st.sidebar.number_input(\"Hora\", min_value=0, max_value=23, step=1, value=12)\n# Crear el DataFrame para la predicción\nX_input = pd.DataFrame({\n    \"año\": [año],\n    \"mes\": [mes],\n    \"dia\": [dia],\n    \"HORA\": [hora],",
+        "detail": "Streamlit.StreamLit",
+        "documentation": {}
+    },
+    {
+        "label": "mes",
+        "kind": 5,
+        "importPath": "Streamlit.StreamLit",
+        "description": "Streamlit.StreamLit",
+        "peekOfCode": "mes = st.sidebar.number_input(\"Mes\", min_value=1, max_value=12, step=1, value=1)\ndia = st.sidebar.number_input(\"Día\", min_value=1, max_value=31, step=1, value=1)\nhora = st.sidebar.number_input(\"Hora\", min_value=0, max_value=23, step=1, value=12)\n# Crear el DataFrame para la predicción\nX_input = pd.DataFrame({\n    \"año\": [año],\n    \"mes\": [mes],\n    \"dia\": [dia],\n    \"HORA\": [hora],\n    \"NOM_ESTACION\": [nom_estacion_codificado]",
+        "detail": "Streamlit.StreamLit",
+        "documentation": {}
+    },
+    {
+        "label": "dia",
+        "kind": 5,
+        "importPath": "Streamlit.StreamLit",
+        "description": "Streamlit.StreamLit",
+        "peekOfCode": "dia = st.sidebar.number_input(\"Día\", min_value=1, max_value=31, step=1, value=1)\nhora = st.sidebar.number_input(\"Hora\", min_value=0, max_value=23, step=1, value=12)\n# Crear el DataFrame para la predicción\nX_input = pd.DataFrame({\n    \"año\": [año],\n    \"mes\": [mes],\n    \"dia\": [dia],\n    \"HORA\": [hora],\n    \"NOM_ESTACION\": [nom_estacion_codificado]\n})",
+        "detail": "Streamlit.StreamLit",
+        "documentation": {}
+    },
+    {
+        "label": "hora",
+        "kind": 5,
+        "importPath": "Streamlit.StreamLit",
+        "description": "Streamlit.StreamLit",
+        "peekOfCode": "hora = st.sidebar.number_input(\"Hora\", min_value=0, max_value=23, step=1, value=12)\n# Crear el DataFrame para la predicción\nX_input = pd.DataFrame({\n    \"año\": [año],\n    \"mes\": [mes],\n    \"dia\": [dia],\n    \"HORA\": [hora],\n    \"NOM_ESTACION\": [nom_estacion_codificado]\n})\n# Mostrar el input en pantalla",
+        "detail": "Streamlit.StreamLit",
+        "documentation": {}
+    },
+    {
+        "label": "X_input",
+        "kind": 5,
+        "importPath": "Streamlit.StreamLit",
+        "description": "Streamlit.StreamLit",
+        "peekOfCode": "X_input = pd.DataFrame({\n    \"año\": [año],\n    \"mes\": [mes],\n    \"dia\": [dia],\n    \"HORA\": [hora],\n    \"NOM_ESTACION\": [nom_estacion_codificado]\n})\n# Mostrar el input en pantalla\nst.write(\"### Datos ingresados para la predicción:\")\nst.dataframe(X_input)",
+        "detail": "Streamlit.StreamLit",
+        "documentation": {}
+    },
+    {
+        "label": "archivos_csv",
+        "kind": 5,
+        "importPath": "Streamlit.Streamlitweb",
+        "description": "Streamlit.Streamlitweb",
+        "peekOfCode": "archivos_csv = {\n    0: 'https://raw.githubusercontent.com/Isaac916/ProyectoContaminaci-n/feature/procesamientoDatos/Proyecto/Procesamiento/Elche-Limpio.csv',\n    1: 'https://raw.githubusercontent.com/Isaac916/ProyectoContaminaci-n/feature/procesamientoDatos/Proyecto/Procesamiento/Orihuela-Limpio.csv',\n    2: 'https://raw.githubusercontent.com/Isaac916/ProyectoContaminaci-n/feature/procesamientoDatos/Proyecto/Procesamiento/Torrevieja-Limpio.csv'\n}\n# Estilo de la página\nst.set_page_config(page_title=\"Visualización de Series Temporales\", page_icon=\"📈\", layout=\"centered\")\n# Título principal\nst.title(\"📈 Visualización de Series Temporales de Gases Contaminantes\")\nst.markdown(\"### Explora los datos de concentración de gases en diferentes estaciones.\")",
+        "detail": "Streamlit.Streamlitweb",
+        "documentation": {}
+    },
+    {
+        "label": "nom_estacion",
+        "kind": 5,
+        "importPath": "Streamlit.Streamlitweb",
+        "description": "Streamlit.Streamlitweb",
+        "peekOfCode": "nom_estacion = st.sidebar.selectbox(\"Selecciona la estación\", [\"ELX - AGROALIMENTARI\", \"ORIHUELA\", \"TORREVIEJA\"])\ngas_seleccionado = st.sidebar.selectbox(\"Selecciona el gas a visualizar\", [\"SO2\", \"CO\", \"O3\"])\n# Convertir la estación a códigos\nestaciones_codificadas = {\"ELX - AGROALIMENTARI\": 0, \"ORIHUELA\": 1, \"TORREVIEJA\": 2}\nnom_estacion_codificado = estaciones_codificadas[nom_estacion]\n# Sección 2: Cargar y mostrar los datos de la estación\nst.markdown(\"### Datos de la estación seleccionada:\")\ntry:\n    # Configurar límite para mostrar más celdas\n    pd.set_option(\"styler.render.max_elements\", None)",
+        "detail": "Streamlit.Streamlitweb",
+        "documentation": {}
+    },
+    {
+        "label": "gas_seleccionado",
+        "kind": 5,
+        "importPath": "Streamlit.Streamlitweb",
+        "description": "Streamlit.Streamlitweb",
+        "peekOfCode": "gas_seleccionado = st.sidebar.selectbox(\"Selecciona el gas a visualizar\", [\"SO2\", \"CO\", \"O3\"])\n# Convertir la estación a códigos\nestaciones_codificadas = {\"ELX - AGROALIMENTARI\": 0, \"ORIHUELA\": 1, \"TORREVIEJA\": 2}\nnom_estacion_codificado = estaciones_codificadas[nom_estacion]\n# Sección 2: Cargar y mostrar los datos de la estación\nst.markdown(\"### Datos de la estación seleccionada:\")\ntry:\n    # Configurar límite para mostrar más celdas\n    pd.set_option(\"styler.render.max_elements\", None)\n    # Cargar datos desde la URL",
+        "detail": "Streamlit.Streamlitweb",
+        "documentation": {}
+    },
+    {
+        "label": "estaciones_codificadas",
+        "kind": 5,
+        "importPath": "Streamlit.Streamlitweb",
+        "description": "Streamlit.Streamlitweb",
+        "peekOfCode": "estaciones_codificadas = {\"ELX - AGROALIMENTARI\": 0, \"ORIHUELA\": 1, \"TORREVIEJA\": 2}\nnom_estacion_codificado = estaciones_codificadas[nom_estacion]\n# Sección 2: Cargar y mostrar los datos de la estación\nst.markdown(\"### Datos de la estación seleccionada:\")\ntry:\n    # Configurar límite para mostrar más celdas\n    pd.set_option(\"styler.render.max_elements\", None)\n    # Cargar datos desde la URL\n    csv_url = archivos_csv[nom_estacion_codificado]\n    response = requests.get(csv_url)",
+        "detail": "Streamlit.Streamlitweb",
+        "documentation": {}
+    },
+    {
+        "label": "nom_estacion_codificado",
+        "kind": 5,
+        "importPath": "Streamlit.Streamlitweb",
+        "description": "Streamlit.Streamlitweb",
+        "peekOfCode": "nom_estacion_codificado = estaciones_codificadas[nom_estacion]\n# Sección 2: Cargar y mostrar los datos de la estación\nst.markdown(\"### Datos de la estación seleccionada:\")\ntry:\n    # Configurar límite para mostrar más celdas\n    pd.set_option(\"styler.render.max_elements\", None)\n    # Cargar datos desde la URL\n    csv_url = archivos_csv[nom_estacion_codificado]\n    response = requests.get(csv_url)\n    response.raise_for_status()",
+        "detail": "Streamlit.Streamlitweb",
+        "documentation": {}
+    }
+]
