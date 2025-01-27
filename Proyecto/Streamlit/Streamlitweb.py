@@ -44,17 +44,19 @@ data = pd.read_csv(csv_path, sep=';', decimal=',')
 with st.expander("Ver datos de muestra"):
     st.write(data.head(10))
 
-# Cargar el modelo del gas seleccionado desde la URL
-modelo_url = modelos[gas_seleccionado]
-
-# Descargar el modelo usando gdown
-output = 'modelo.pkl'
-
-with st.spinner('Cargando el modelo...'):
-    # Descargar y cargar el modelo aquí
-    gdown.download(modelo_url, output, quiet=False)
+# Función para cargar el modelo con caché
+@st.cache_resource
+def cargar_modelo(url):
+    output = 'modelo.pkl'
+    gdown.download(url, output, quiet=False)
     with open(output, 'rb') as file:
         modelo = pickle.load(file)
+    return modelo
+
+# Cargar el modelo del gas seleccionado desde la URL con caché
+modelo_url = modelos[gas_seleccionado]
+with st.spinner('Cargando el modelo...'):
+    modelo = cargar_modelo(modelo_url)
 st.success("Modelo cargado correctamente")
 
 # Inputs del usuario
