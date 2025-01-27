@@ -1,3 +1,4 @@
+from io import BytesIO
 import os
 import pickle
 import requests
@@ -28,20 +29,40 @@ st.set_page_config(page_title="Predicción de Gases", page_icon="⛅", layout="c
 st.title("⛅ Predicción de Gases Contaminantes ⛅")
 st.markdown("### Bienvenido a la herramienta de predicción de gases. Selecciona el gas y proporciona los parámetros necesarios para obtener la predicción.")
 
-# Función para descargar el modelo
-def descargar_modelo(url, output_path):
-    response = requests.get(url)
-    if response.status_code == 200:
-        if response.headers['Content-Type'] == 'application/octet-stream':
-            with open(output_path, 'wb') as f:
-                f.write(response.content)
-            return True
+def descargar_modelo(url):
+    try:
+        response = requests.get(url)
+        # Verificar si la respuesta es exitosa y contiene datos binarios
+        if response.status_code == 200:
+            # Verificar si el contenido parece un archivo binario adecuado (típicamente .pkl)
+            if b'PK' in response.content[:2]:  # Esto es solo una comprobación inicial
+                return BytesIO(response.content)
+            else:
+                st.error("El archivo descargado no parece ser un archivo binario válido.")
+                return None
         else:
-            st.error("La URL no está devolviendo un archivo binario válido.")
-            return False
-    else:
-        st.error("No se pudo descargar el archivo desde la URL.")
-        return False
+            st.error(f"Error al descargar el archivo: {response.status_code}")
+            return None
+    except Exception as e:
+        st.error(f"Error al intentar descargar el modelo: {e}")
+        return None
+
+# Establecer el gas a predecir
+gas_seleccionado = "SO2"  # Cambia esto por el gas deseado
+modelo_url = 'https://storage.cloud.google.com/almacenamientoproyectocontaminacion/SO2_model.pkl?authuser=1'
+
+# Intentar descargar el modelo
+modelo_data = descargar_modelo(modelo_url)
+
+if modelo_data:
+    try:
+        # Cargar el modelo desde el archivo descargado (usando BytesIO para manejar datos binarios)
+        modelo = load(modelo_data)
+        st.success("Modelo cargado correctamente.")
+    except Exception as e:
+        st.error(f"Error al cargar el modelo con joblib: {e}")
+else:
+    st.error("No se pudo cargar el modelo desde la URL.")
 
 # Selección del gas
 st.sidebar.header("Configuración de Predicción")
