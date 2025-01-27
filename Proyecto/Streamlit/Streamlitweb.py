@@ -2,7 +2,7 @@ import os
 import streamlit as st
 import pickle
 import pandas as pd
-import requests
+import gdown  # Para descargar el archivo directamente de Google Drive
 
 # Diccionario con enlaces directos a los archivos CSV en GitHub (usando raw)
 archivos_csv = {
@@ -14,8 +14,8 @@ archivos_csv = {
 # Diccionario de modelos con enlaces crudos a los archivos .pkl
 modelos = {   
     "SO2": 'https://drive.google.com/uc?export=download&id=1IdiOg_3CGe2I0AsZvgX33zxjoV27CSu2',  # URL de descarga directa
-    "CO": 'https://drive.google.com/uc?export=download&id=ID_DEL_ARCHIVO_CO',
-    "O3": 'https://drive.google.com/uc?export=download&id=ID_DEL_ARCHIVO_O3'
+    "CO": 'https://drive.google.com/uc?export=download&id=ID_DEL_ARCHIVO_CO',  # Reemplaza con la URL correcta para el modelo de CO
+    "O3": 'https://drive.google.com/uc?export=download&id=ID_DEL_ARCHIVO_O3'   # Reemplaza con la URL correcta para el modelo de O3
 }
 
 # Estilo de la página
@@ -47,24 +47,13 @@ with st.expander("Ver datos de muestra"):
 # Cargar el modelo del gas seleccionado desde la URL
 modelo_url = modelos[gas_seleccionado]
 
-# Descargar el modelo usando requests y cargarlo
-response = requests.get(modelo_url)
+# Descargar el modelo usando gdown
+output = 'modelo.pkl'
+gdown.download(modelo_url, output, quiet=False)
 
-# Verificar si la descarga fue exitosa
-if response.status_code == 200:
-    with open('modelo.pkl', 'wb') as f:
-        f.write(response.content)
-
-    # Cargar el modelo desde el archivo descargado
-    try:
-        with open('modelo.pkl', 'rb') as file:
-            modelo = pickle.load(file)
-    except Exception as e:
-        st.error(f"Error al cargar el modelo: {e}")
-        st.stop()
-else:
-    st.error("No se pudo descargar el archivo del modelo. Verifica la URL y vuelve a intentarlo.")
-    st.stop()
+# Cargar el modelo desde el archivo descargado
+with open(output, 'rb') as file:
+    modelo = pickle.load(file)
 
 # Inputs del usuario
 st.sidebar.subheader("Parámetros de entrada")
@@ -89,12 +78,9 @@ st.dataframe(X_input)
 # Botón para realizar la predicción
 if st.button("Predecir"):
     # Realizar la predicción
-    try:
-        prediccion = modelo.predict(X_input)[0]
-        st.success(f"El valor predicho para {gas_seleccionado} es: {prediccion:.2f}")
-        st.balloons()
-    except Exception as e:
-        st.error(f"Error al realizar la predicción: {e}")
+    prediccion = modelo.predict(X_input)[0]
+    st.success(f"El valor predicho para {gas_seleccionado} es: {prediccion:.2f}")
+    st.balloons()
 
 # Pie de página
 st.markdown("---")
