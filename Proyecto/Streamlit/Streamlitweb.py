@@ -1,15 +1,8 @@
-import joblib
 import os
 import streamlit as st
+import pickle
 import pandas as pd
 import requests
-
-try:
-    import joblib
-except ImportError:
-    import pip
-    pip.main(['install', 'joblib'])  # Instala joblib si no está disponible
-    import joblib
 
 # Diccionario con enlaces directos a los archivos CSV en GitHub (usando raw)
 archivos_csv = {
@@ -21,8 +14,8 @@ archivos_csv = {
 # Diccionario de modelos con enlaces crudos a los archivos .pkl
 modelos = {   
     "SO2": 'https://storage.cloud.google.com/almacenamientoproyectocontaminacion/SO2_model.pkl?authuser=1',
-    "CO": 'https://storage.cloud.google.com/almacenamientoproyectocontaminacion/CO_model.pkl?authuser=1',
-    "O3": 'https://storage.cloud.google.com/almacenamientoproyectocontaminacion/O3_model.pkl?authuser=1'
+    "CO": 'https://storage.cloud.google.com/almacenamientoproyectocontaminacion/SO2_model.pkl?authuser=1',
+    "O3": 'https://storage.cloud.google.com/almacenamientoproyectocontaminacion/SO2_model.pkl?authuser=1'
 }
 
 # Estilo de la página
@@ -99,11 +92,11 @@ X_input = pd.DataFrame({
     "NOM_ESTACION": [nom_estacion_codificado]
 })
 
-# Mostrar el input en pantalla adadada
+# Mostrar el input en pantalla
 st.write("### Datos ingresados para la predicción:")
 st.dataframe(X_input)
 
-# Botón para realizar la redicción
+# Botón para realizar la predicción
 if st.button("Predecir"):
     # Verificar si el modelo fue cargado correctamente
     if modelo is not None:
@@ -113,3 +106,7 @@ if st.button("Predecir"):
         st.balloons()
     else:
         st.error("No se pudo cargar el modelo.")
+
+# Pie de página
+st.markdown("---")
+st.markdown("**Desarrollado por [Isaac Abarca | Javi Gomez | Troy Barker]** • [GitHub](https://github.com/Isaac916/ProyectoContaminaci-n) • © 2025")
