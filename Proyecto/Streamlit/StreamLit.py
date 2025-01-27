@@ -8,9 +8,9 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # Construir las rutas relativas de los archivos
 archivos_csv = {
-    0: os.path.join(BASE_DIR, '../Procesamiento/Elche-Limpio.csv'),
-    1: os.path.join(BASE_DIR, '../Procesamiento/Orihuela-Limpio.csv'),
-    2: os.path.join(BASE_DIR, '../Procesamiento/Torrevieja-Limpio.csv')
+    0: os.path.join(BASE_DIR, 'https://github.com/Isaac916/ProyectoContaminaci-n/blob/feature/procesamientoDatos/Proyecto/Procesamiento/Elche-Limpio.csv'),
+    1: os.path.join(BASE_DIR, 'https://github.com/Isaac916/ProyectoContaminaci-n/blob/feature/procesamientoDatos/Proyecto/Procesamiento/Orihuela-Limpio.csv'),
+    2: os.path.join(BASE_DIR, 'https://github.com/Isaac916/ProyectoContaminaci-n/blob/feature/procesamientoDatos/Proyecto/Procesamiento/Torrevieja-Limpio.csv')
 }
 
 modelos = {
