@@ -7,17 +7,17 @@ import pandas as pd
 # Obtener la ruta del directorio actual del script
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
+# Construir las rutas relativas de los archivos CSV
 archivos_csv = {
     0: 'https://raw.githubusercontent.com/Isaac916/ProyectoContaminaci-n/feature/procesamientoDatos/Proyecto/Procesamiento/Elche-Limpio.csv',
     1: 'https://raw.githubusercontent.com/Isaac916/ProyectoContaminaci-n/feature/procesamientoDatos/Proyecto/Procesamiento/Orihuela-Limpio.csv',
     2: 'https://raw.githubusercontent.com/Isaac916/ProyectoContaminaci-n/feature/procesamientoDatos/Proyecto/Procesamiento/Torrevieja-Limpio.csv'
 }
 
-# Rutas de los modelos
 modelos = {
-    "SO2": 'https://storage.googleapis.com/almacenamientoproyectocontaminacion/SO2_model.pkl?authuser=1',
-    "CO": 'https://storage.googleapis.com/almacenamientoproyectocontaminacion/SO2_model.pkl?authuser=1',
-    "O3": 'https://storage.googleapis.com/almacenamientoproyectocontaminacion/SO2_model.pkl?authuser=1'
+    "SO2": 'https://storage.cloud.google.com/almacenamientoproyectocontaminacion/SO2_model.pkl',
+    "CO": 'https://storage.cloud.google.com/almacenamientoproyectocontaminacion/SO2_model.pkl',
+    "O3": 'https://storage.cloud.google.com/almacenamientoproyectocontaminacion/SO2_model.pkl'
 }
 
 # Estilo de la página
@@ -27,23 +27,27 @@ st.set_page_config(page_title="Predicción de Gases", page_icon="⛅", layout="c
 st.title("⛅ Predicción de Gases Contaminantes ⛅")
 st.markdown("### Bienvenido a la herramienta de predicción de gases. Selecciona el gas y proporciona los parámetros necesarios para obtener la predicción.")
 
-# Función para descargar el modelo
+# Función para descargar el modelo desde la URL pública
 def descargar_modelo(url, output_path):
-    # Realizar una solicitud GET para descargar el modelo
-    response = requests.get(url)
-    
-    # Verificar si la solicitud fue exitosa
+    response = requests.get(url, stream=True)
     if response.status_code == 200:
-        # Verificar si no se descargó HTML (lo cual indica que algo salió mal)
-        if response.headers['Content-Type'] == 'text/html':
-            st.error("Hubo un problema al descargar el modelo. La URL puede estar incorrecta.")
-            return False
         with open(output_path, 'wb') as f:
-            f.write(response.content)
+            for chunk in response.iter_content(1024):
+                f.write(chunk)
         return True
     else:
-        st.error(f"Error al descargar el archivo. Código de respuesta: {response.status_code}")
+        st.error(f"No se pudo descargar el modelo. Código de error: {response.status_code}")
         return False
+
+# Función para verificar si el archivo del modelo es válido
+def verificar_modelo(modelo_path):
+    try:
+        with open(modelo_path, 'rb') as file:
+            modelo = pickle.load(file)
+        return modelo
+    except Exception as e:
+        st.error(f"Error al cargar el modelo: {str(e)}")
+        return None
 
 # Selección del gas
 st.sidebar.header("Configuración de Predicción")
@@ -64,15 +68,18 @@ data = pd.read_csv(csv_path, sep=';', decimal=',')
 with st.expander("Ver datos de muestra"):
     st.write(data.head(10))
 
-# Descargar el modelo
+# Descargar el modelo desde la URL pública
 modelo_url = modelos[gas_seleccionado]
 modelo_path = f'{gas_seleccionado}_model.pkl'  # Ruta temporal para guardar el archivo
 
-# Descargar y cargar el modelo
+# Descargar el modelo
 if descargar_modelo(modelo_url, modelo_path):
-    try:
-        with open(modelo_path, 'rb') as file:
-            modelo = pickle.load(file)
+    st.success("Modelo descargado correctamente desde la URL pública.")
+    
+    # Verificar que el modelo descargado sea válido
+    modelo = verificar_modelo(modelo_path)
+    
+    if modelo:
         st.success("Modelo cargado correctamente.")
         
         # Inputs del usuario
@@ -97,15 +104,15 @@ if descargar_modelo(modelo_url, modelo_path):
 
         # Botón para realizar la predicción
         if st.button("Predecir"):
-            # Realizar la predicción
-            prediccion = modelo.predict(X_input)[0]
-            st.success(f"El valor predicho para {gas_seleccionado} es: {prediccion:.2f}")
-            st.balloons()
-
-    except Exception as e:
-        st.error(f"Hubo un problema al cargar el modelo. Detalles del error: {e}")
+            if modelo:
+                # Realizar la predicción
+                prediccion = modelo.predict(X_input)[0]
+                st.success(f"El valor predicho para {gas_seleccionado} es: {prediccion:.2f}")
+                st.balloons()
+            else:
+                st.error("El modelo no se cargó correctamente, no se puede hacer la predicción.")
 else:
-    st.error("No se pudo cargar el modelo desde la URL.")
+    st.error("No se pudo descargar el modelo desde la URL pública.")
 
 # Pie de página
 st.markdown("---")
