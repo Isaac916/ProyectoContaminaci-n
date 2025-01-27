@@ -11,11 +11,11 @@ archivos_csv = {
     2: 'https://raw.githubusercontent.com/Isaac916/ProyectoContaminaci-n/feature/procesamientoDatos/Proyecto/Procesamiento/Torrevieja-Limpio.csv'
 }
 
-# Diccionario de modelos con enlaces crudos a los archivos .pkl (URL pública)
+# Diccionario de modelos con enlaces crudos a los archivos .pkl
 modelos = {   
-    "SO2": 'https://storage.googleapis.com/almacenamientoproyectocontaminacion/SO2_model.pkl',  # URL pública del modelo en el bucket
-    "CO": 'https://storage.googleapis.com/almacenamientoproyectocontaminacion/SO2_model.pkl',  # URL pública del modelo CO
-    "O3": 'https://storage.googleapis.com/almacenamientoproyectocontaminacion/SO2_model.pkl'   # URL pública del modelo O3
+    "SO2": 'https://storage.cloud.google.com/almacenamientoproyectocontaminacion/SO2_model.pkl?authuser=1',  # URL pública del modelo en el bucket
+    "CO": 'https://storage.cloud.google.com/almacenamientoproyectocontaminacion/SO2_model.pkl?authuser=1',  # URL pública del modelo CO
+    "O3": 'https://storage.cloud.google.com/almacenamientoproyectocontaminacion/SO2_model.pkl?authuser=1'   # URL pública del modelo O3
 }
 
 # Estilo de la página
@@ -47,21 +47,21 @@ with st.expander("Ver datos de muestra"):
 # Función para descargar el archivo desde Google Cloud Storage utilizando requests
 def descargar_modelo(url, output):
     try:
-        # Intentar obtener el archivo de la URL
         response = requests.get(url, stream=True)
-
-        # Verificar si la solicitud fue exitosa
+        print(f"Status Code: {response.status_code}")  # Verificar el estado de la respuesta
         if response.status_code == 200:
             with open(output, 'wb') as f:
                 for chunk in response.iter_content(chunk_size=1024):
                     if chunk:
                         f.write(chunk)
+            print("Modelo descargado exitosamente.")
             return True
         else:
             st.error(f"Error al descargar el modelo. Código de error: {response.status_code}")
             return False
     except Exception as e:
         st.error(f"Error al descargar el modelo: {e}")
+        print(f"Excepción: {e}")
         return False
 
 # Función para cargar el modelo con caché
@@ -78,7 +78,11 @@ def cargar_modelo(url):
 modelo_url = modelos[gas_seleccionado]
 with st.spinner('Cargando el modelo...'):
     modelo = cargar_modelo(modelo_url)
-st.success("Modelo cargado correctamente")
+
+if modelo is None:
+    st.error("Error: El modelo no se pudo cargar. Verifica la URL y el archivo del modelo.")
+else:
+    st.success("Modelo cargado correctamente")
 
 # Inputs del usuario
 st.sidebar.subheader("Parámetros de entrada")
@@ -102,10 +106,13 @@ st.dataframe(X_input)
 
 # Botón para realizar la predicción
 if st.button("Predecir"):
-    # Realizar la predicción
-    prediccion = modelo.predict(X_input)[0]
-    st.success(f"El valor predicho para {gas_seleccionado} es: {prediccion:.2f}")
-    st.balloons()
+    if modelo is not None:
+        # Realizar la predicción
+        prediccion = modelo.predict(X_input)[0]
+        st.success(f"El valor predicho para {gas_seleccionado} es: {prediccion:.2f}")
+        st.balloons()
+    else:
+        st.error("No se puede realizar la predicción porque el modelo no está disponible.")
 
 # Pie de página
 st.markdown("---")
