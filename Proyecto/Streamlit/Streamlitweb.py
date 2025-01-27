@@ -13,9 +13,9 @@ archivos_csv = {
 
 # Diccionario de modelos con enlaces crudos a los archivos .pkl
 modelos = {   
-    "SO2": 'https://drive.google.com/uc?export=download&id=1IdiOg_3CGe2I0AsZvgX33zxjoV27CSu2',  # URL de descarga directa
-    "CO": 'https://drive.google.com/uc?export=download&id=ID_DEL_ARCHIVO_CO',  # Reemplaza con la URL correcta para el modelo de CO
-    "O3": 'https://drive.google.com/uc?export=download&id=ID_DEL_ARCHIVO_O3'   # Reemplaza con la URL correcta para el modelo de O3
+    "SO2": 'https://storage.cloud.google.com/almacenamientoproyectocontaminacion/SO2_model.pkl?authuser=1',  # URL pública del modelo en el bucket
+    "CO": 'https://storage.cloud.google.com/almacenamientoproyectocontaminacion/SO2_model.pkl?authuser=1',  # URL pública del modelo CO
+    "O3": 'https://storage.cloud.google.com/almacenamientoproyectocontaminacion/SO2_model.pkl?authuser=1'   # URL pública del modelo O3
 }
 
 # Estilo de la página
@@ -44,14 +44,9 @@ data = pd.read_csv(csv_path, sep=';', decimal=',')
 with st.expander("Ver datos de muestra"):
     st.write(data.head(10))
 
-# Función para descargar el archivo desde Google Drive utilizando requests
+# Función para descargar el archivo desde Google Cloud Storage utilizando requests
 def descargar_modelo(url, output):
-    # Extraer el ID del archivo de la URL de Google Drive
-    file_id = url.split('id=')[1]
-    download_url = f'https://drive.google.com/uc?export=download&id=1IdiOg_3CGe2I0AsZvgX33zxjoV27CSu2'
-
-    # Hacer la solicitud HTTP para descargar el archivo
-    response = requests.get(download_url, stream=True)
+    response = requests.get(url, stream=True)
 
     # Verificar si la solicitud fue exitosa
     if response.status_code == 200:
