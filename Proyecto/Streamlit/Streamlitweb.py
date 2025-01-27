@@ -2,21 +2,20 @@ import os
 import streamlit as st
 import pickle
 import pandas as pd
+import requests
 
-# Obtener la ruta del directorio actual del script
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-
-# Construir las rutas relativas de los archivos
+# Diccionario con enlaces directos a los archivos CSV en GitHub (usando raw)
 archivos_csv = {
-    0: os.path.join(BASE_DIR, '../Procesamiento/Elche-Limpio.csv'),
-    1: os.path.join(BASE_DIR, '../Procesamiento/Orihuela-Limpio.csv'),
-    2: os.path.join(BASE_DIR, '../Procesamiento/Torrevieja-Limpio.csv')
+    0: 'https://raw.githubusercontent.com/Isaac916/ProyectoContaminaci-n/feature/procesamientoDatos/Proyecto/Procesamiento/Elche-Limpio.csv',
+    1: 'https://raw.githubusercontent.com/Isaac916/ProyectoContaminaci-n/feature/procesamientoDatos/Proyecto/Procesamiento/Orihuela-Limpio.csv',
+    2: 'https://raw.githubusercontent.com/Isaac916/ProyectoContaminaci-n/feature/procesamientoDatos/Proyecto/Procesamiento/Torrevieja-Limpio.csv'
 }
 
-modelos = {
-    "SO2": os.path.join(BASE_DIR, '../MachineLearning/SO2_model.pkl'),
-    "CO": os.path.join(BASE_DIR, '../MachineLearning/CO_model.pkl'),
-    "O3": os.path.join(BASE_DIR, '../MachineLearning/O3_model.pkl')
+# Diccionario de modelos con enlaces crudos a los archivos .pkl
+modelos = {   
+    "SO2": 'https://drive.google.com/uc?export=download&id=1IdiOg_3CGe2I0AsZvgX33zxjoV27CSu2',  # URL de descarga directa
+    "CO": 'https://drive.google.com/uc?export=download&id=ID_DEL_ARCHIVO_CO',
+    "O3": 'https://drive.google.com/uc?export=download&id=ID_DEL_ARCHIVO_O3'
 }
 
 # Estilo de la página
@@ -45,9 +44,16 @@ data = pd.read_csv(csv_path, sep=';', decimal=',')
 with st.expander("Ver datos de muestra"):
     st.write(data.head(10))
 
-# Cargar el modelo del gas seleccionado
-modelo_path = modelos[gas_seleccionado]
-with open(modelo_path, 'rb') as file:
+# Cargar el modelo del gas seleccionado desde la URL
+modelo_url = modelos[gas_seleccionado]
+
+# Descargar el modelo usando requests y cargarlo
+response = requests.get(modelo_url)
+with open('modelo.pkl', 'wb') as f:
+    f.write(response.content)
+
+# Cargar el modelo desde el archivo descargado
+with open('modelo.pkl', 'rb') as file:
     modelo = pickle.load(file)
 
 # Inputs del usuario
