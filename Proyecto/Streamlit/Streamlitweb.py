@@ -9,11 +9,13 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # Construir las rutas relativas de los archivos CSV
 # Rutas de los archivos CSV en GitHub
+
 archivos_csv = {
-    0: 'https://raw.githubusercontent.com/Isaac916/ProyectoContaminaci-n/main/Procesamiento/Elche-Limpio.csv',
-    1: 'https://raw.githubusercontent.com/Isaac916/ProyectoContaminaci-n/main/Procesamiento/Orihuela-Limpio.csv',
-    2: 'https://raw.githubusercontent.com/Isaac916/ProyectoContaminaci-n/main/Procesamiento/Torrevieja-Limpio.csv'
+    0: 'https://raw.githubusercontent.com/Isaac916/ProyectoContaminaci-n/feature/procesamientoDatos/Proyecto/Procesamiento/Elche-Limpio.csv',
+    1: 'https://raw.githubusercontent.com/Isaac916/ProyectoContaminaci-n/feature/procesamientoDatos/Proyecto/Procesamiento/Orihuela-Limpio.csv',
+    2: 'https://raw.githubusercontent.com/Isaac916/ProyectoContaminaci-n/feature/procesamientoDatos/Proyecto/Procesamiento/Torrevieja-Limpio.csv'
 }
+
 
 
 modelos = {
@@ -21,8 +23,9 @@ modelos = {
     "CO": 'https://storage.cloud.google.com/almacenamientoproyectocontaminacion/SO2_model.pkl?authuser=1',
     "O3": 'https://storage.cloud.google.com/almacenamientoproyectocontaminacion/SO2_model.pkl?authuser=1'
 }
+ 
 
-# Estilo de la página
+# Estilo dedada la página
 st.set_page_config(page_title="Predicción de Gases", page_icon="⛅", layout="centered")
 
 # Título principal
@@ -53,6 +56,7 @@ estaciones_codificadas = {"ELX - AGROALIMENTARI": 0, "ORIHUELA": 1, "TORREVIEJA"
 nom_estacion_codificado = estaciones_codificadas[nom_estacion]
 
 # Cargar el archivo CSV de acuerdo a la estación seleccionada
+#gola
 csv_path = archivos_csv[nom_estacion_codificado]
 data = pd.read_csv(csv_path, sep=';', decimal=',')
 
