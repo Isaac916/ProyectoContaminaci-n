@@ -49,11 +49,13 @@ modelo_url = modelos[gas_seleccionado]
 
 # Descargar el modelo usando gdown
 output = 'modelo.pkl'
-gdown.download(modelo_url, output, quiet=False)
 
-# Cargar el modelo desde el archivo descargado
-with open(output, 'rb') as file:
-    modelo = pickle.load(file)
+with st.spinner('Cargando el modelo...'):
+    # Descargar y cargar el modelo aquí
+    gdown.download(modelo_url, output, quiet=False)
+    with open(output, 'rb') as file:
+        modelo = pickle.load(file)
+st.success("Modelo cargado correctamente")
 
 # Inputs del usuario
 st.sidebar.subheader("Parámetros de entrada")
