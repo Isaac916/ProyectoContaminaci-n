@@ -40,6 +40,9 @@ try:
     columnas_relevantes = ['FECHA', 'HORA', 'NOM_ESTACION', 'SO2', 'CO', 'O3']
     data = data[columnas_relevantes]
 
+    # Eliminar filas con valores nulos en las columnas seleccionadas
+    data = data.dropna(subset=['FECHA', 'HORA', 'NOM_ESTACION', 'SO2', 'CO', 'O3'])
+
     # Mostrar todos los datos filtrados
     st.dataframe(data.style.format(precision=2).set_properties(**{'background-color': '#f9f9f9', 'color': '#333', 'border-color': 'black'}))
 
