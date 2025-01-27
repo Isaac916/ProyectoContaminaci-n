@@ -30,6 +30,9 @@ nom_estacion_codificado = estaciones_codificadas[nom_estacion]
 # Sección 2: Cargar y mostrar los datos de la estación
 st.markdown("### Datos de la estación seleccionada:")
 try:
+    # Configurar límite para mostrar más celdas
+    pd.set_option("styler.render.max_elements", None)
+
     # Cargar datos desde la URL
     csv_url = archivos_csv[nom_estacion_codificado]
     response = requests.get(csv_url)
@@ -44,7 +47,7 @@ try:
     data = data.dropna(subset=['FECHA', 'HORA', 'NOM_ESTACION', 'SO2', 'CO', 'O3'])
 
     # Mostrar todos los datos filtrados
-    st.dataframe(data.style.format(precision=2).set_properties(**{'background-color': '#f9f9f9', 'color': '#333', 'border-color': 'black'}))
+    st.dataframe(data)
 
     # Validar que el gas seleccionado esté en las columnas
     if gas_seleccionado not in data.columns:
