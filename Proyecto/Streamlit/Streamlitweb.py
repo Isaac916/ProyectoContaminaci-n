@@ -99,11 +99,11 @@ X_input = pd.DataFrame({
     "NOM_ESTACION": [nom_estacion_codificado]
 })
 
-# Mostrar el input en pantalla
+# Mostrar el input en pantalla adadada
 st.write("### Datos ingresados para la predicción:")
 st.dataframe(X_input)
 
-# Botón para realizar la predicción
+# Botón para realizar la redicción
 if st.button("Predecir"):
     # Verificar si el modelo fue cargado correctamente
     if modelo is not None:
