@@ -2,7 +2,7 @@ import os
 import streamlit as st
 import pickle
 import pandas as pd
-import gdown  # Para descargar el archivo directamente de Google Drive
+import requests  # Usamos requests para la descarga
 
 # Diccionario con enlaces directos a los archivos CSV en GitHub (usando raw)
 archivos_csv = {
@@ -44,14 +44,35 @@ data = pd.read_csv(csv_path, sep=';', decimal=',')
 with st.expander("Ver datos de muestra"):
     st.write(data.head(10))
 
+# Función para descargar el archivo desde Google Drive utilizando requests
+def descargar_modelo(url, output):
+    # Extraer el ID del archivo de la URL de Google Drive
+    file_id = url.split('id=')[1]
+    download_url = f'https://drive.google.com/uc?export=download&id=1IdiOg_3CGe2I0AsZvgX33zxjoV27CSu2'
+
+    # Hacer la solicitud HTTP para descargar el archivo
+    response = requests.get(download_url, stream=True)
+
+    # Verificar si la solicitud fue exitosa
+    if response.status_code == 200:
+        with open(output, 'wb') as f:
+            for chunk in response.iter_content(chunk_size=1024):
+                if chunk:
+                    f.write(chunk)
+        return True
+    else:
+        st.error("Error al descargar el modelo.")
+        return False
+
 # Función para cargar el modelo con caché
 @st.cache_resource
 def cargar_modelo(url):
     output = 'modelo.pkl'
-    gdown.download(url, output, quiet=False)
-    with open(output, 'rb') as file:
-        modelo = pickle.load(file)
-    return modelo
+    if descargar_modelo(url, output):
+        with open(output, 'rb') as file:
+            modelo = pickle.load(file)
+        return modelo
+    return None
 
 # Cargar el modelo del gas seleccionado desde la URL con caché
 modelo_url = modelos[gas_seleccionado]
