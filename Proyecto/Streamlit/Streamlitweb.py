@@ -3,6 +3,7 @@ import pickle
 import requests
 import streamlit as st
 import pandas as pd
+from joblib import load, dump
 
 # Obtener la ruta del directorio actual del script
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -27,31 +28,20 @@ st.set_page_config(page_title="Predicción de Gases", page_icon="⛅", layout="c
 st.title("⛅ Predicción de Gases Contaminantes ⛅")
 st.markdown("### Bienvenido a la herramienta de predicción de gases. Selecciona el gas y proporciona los parámetros necesarios para obtener la predicción.")
 
-# Función para descargar el modelo desde la URL pública
+# Función para descargar el modelo
 def descargar_modelo(url, output_path):
-    response = requests.get(url, stream=True)
+    response = requests.get(url)
     if response.status_code == 200:
-        # Verificar si el archivo descargado es HTML
-        if response.text.startswith("<html>"):
-            st.error("El archivo descargado parece ser una página HTML. Verifica la URL del archivo.")
+        if response.headers['Content-Type'] == 'application/octet-stream':
+            with open(output_path, 'wb') as f:
+                f.write(response.content)
+            return True
+        else:
+            st.error("La URL no está devolviendo un archivo binario válido.")
             return False
-        with open(output_path, 'wb') as f:
-            for chunk in response.iter_content(1024):
-                f.write(chunk)
-        return True
     else:
-        st.error(f"No se pudo descargar el modelo. Código de error: {response.status_code}")
+        st.error("No se pudo descargar el archivo desde la URL.")
         return False
-
-# Función para verificar si el archivo del modelo es válido
-def verificar_modelo(modelo_path):
-    try:
-        with open(modelo_path, 'rb') as file:
-            modelo = pickle.load(file)
-        return modelo
-    except Exception as e:
-        st.error(f"Error al cargar el modelo: {str(e)}")
-        return None
 
 # Selección del gas
 st.sidebar.header("Configuración de Predicción")
@@ -72,51 +62,50 @@ data = pd.read_csv(csv_path, sep=';', decimal=',')
 with st.expander("Ver datos de muestra"):
     st.write(data.head(10))
 
-# Descargar el modelo desde la URL pública
+# Descargar el modelo
 modelo_url = modelos[gas_seleccionado]
 modelo_path = f'{gas_seleccionado}_model.pkl'  # Ruta temporal para guardar el archivo
 
-# Descargar el modelo
+# Descargar y cargar el modelo
 if descargar_modelo(modelo_url, modelo_path):
-    st.success("Modelo descargado correctamente desde la URL pública.")
-    
-    # Verificar que el modelo descargado sea válido
-    modelo = verificar_modelo(modelo_path)
-    
-    if modelo:
+    try:
+        # Cargar el modelo con joblib
+        modelo = load(modelo_path)
         st.success("Modelo cargado correctamente.")
-        
-        # Inputs del usuario
-        st.sidebar.subheader("Parámetros de entrada")
-        año = st.sidebar.number_input("Año", min_value=2000, max_value=2100, step=1, value=2023)
-        mes = st.sidebar.number_input("Mes", min_value=1, max_value=12, step=1, value=1)
-        dia = st.sidebar.number_input("Día", min_value=1, max_value=31, step=1, value=1)
-        hora = st.sidebar.number_input("Hora", min_value=0, max_value=23, step=1, value=12)
+    except Exception as e:
+        st.error(f"Error al cargar el modelo: {e}")
+    
+    # Inputs del usuario
+    st.sidebar.subheader("Parámetros de entrada")
+    año = st.sidebar.number_input("Año", min_value=2000, max_value=2100, step=1, value=2023)
+    mes = st.sidebar.number_input("Mes", min_value=1, max_value=12, step=1, value=1)
+    dia = st.sidebar.number_input("Día", min_value=1, max_value=31, step=1, value=1)
+    hora = st.sidebar.number_input("Hora", min_value=0, max_value=23, step=1, value=12)
 
-        # Crear el DataFrame para la predicción
-        X_input = pd.DataFrame({
-            "año": [año],
-            "mes": [mes],
-            "dia": [dia],
-            "HORA": [hora],
-            "NOM_ESTACION": [nom_estacion_codificado]
-        })
+    # Crear el DataFrame para la predicción
+    X_input = pd.DataFrame({
+        "año": [año],
+        "mes": [mes],
+        "dia": [dia],
+        "HORA": [hora],
+        "NOM_ESTACION": [nom_estacion_codificado]
+    })
 
-        # Mostrar el input en pantalla
-        st.write("### Datos ingresados para la predicción:")
-        st.dataframe(X_input)
+    # Mostrar el input en pantalla
+    st.write("### Datos ingresados para la predicción:")
+    st.dataframe(X_input)
 
-        # Botón para realizar la predicción
-        if st.button("Predecir"):
-            if modelo:
-                # Realizar la predicción
-                prediccion = modelo.predict(X_input)[0]
-                st.success(f"El valor predicho para {gas_seleccionado} es: {prediccion:.2f}")
-                st.balloons()
-            else:
-                st.error("El modelo no se cargó correctamente, no se puede hacer la predicción.")
+    # Botón para realizar la predicción
+    if st.button("Predecir"):
+        if 'modelo' in locals():
+            # Realizar la predicción
+            prediccion = modelo.predict(X_input)[0]
+            st.success(f"El valor predicho para {gas_seleccionado} es: {prediccion:.2f}")
+            st.balloons()
+        else:
+            st.error("Modelo no cargado correctamente, no se puede hacer la predicción.")
 else:
-    st.error("No se pudo descargar el modelo desde la URL pública.")
+    st.error("No se pudo cargar el modelo desde la URL.")
 
 # Pie de página
 st.markdown("---")
