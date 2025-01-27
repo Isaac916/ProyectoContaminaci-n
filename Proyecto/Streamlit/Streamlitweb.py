@@ -23,8 +23,8 @@ archivos_csv = {
 
 modelos = {
     "SO2": 'SO2_model.pkl',
-    "CO": 'CO_model.pkl',
-    "O3": 'O3_model.pkl'
+    "CO": 'SO2_model.pkl',
+    "O3": 'SO2_model.pkl'
 }
 
 # Estilo de la página
