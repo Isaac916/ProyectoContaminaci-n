@@ -53,6 +53,15 @@
         "documentation": {}
     },
     {
+        "label": "plotly.express",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "plotly.express",
+        "description": "plotly.express",
+        "detail": "plotly.express",
+        "documentation": {}
+    },
+    {
         "label": "StringIO",
         "importPath": "io",
         "description": "io",
@@ -61,12 +70,11 @@
         "documentation": {}
     },
     {
-        "label": "plotly.express",
-        "kind": 6,
+        "label": "StringIO",
+        "importPath": "io",
+        "description": "io",
         "isExtraImport": true,
-        "importPath": "plotly.express",
-        "description": "plotly.express",
-        "detail": "plotly.express",
+        "detail": "io",
         "documentation": {}
     },
     {
@@ -256,6 +264,51 @@
         "description": "Streamlit.StreamLit",
         "peekOfCode": "X_input = pd.DataFrame({\n    \"año\": [año],\n    \"mes\": [mes],\n    \"dia\": [dia],\n    \"HORA\": [hora],\n    \"NOM_ESTACION\": [nom_estacion_codificado]\n})\n# Mostrar el input en pantalla\nst.write(\"### Datos ingresados para la predicción:\")\nst.dataframe(X_input)",
         "detail": "Streamlit.StreamLit",
+        "documentation": {}
+    },
+    {
+        "label": "cargar_datos",
+        "kind": 2,
+        "importPath": "Streamlit.StreamLitGraficos",
+        "description": "Streamlit.StreamLitGraficos",
+        "peekOfCode": "def cargar_datos(url):\n    response = requests.get(url)\n    if response.status_code == 200:\n        data = pd.read_csv(StringIO(response.text), sep=';')\n        return data\n    else:\n        st.error(f\"Error al cargar el archivo desde {url}\")\n        return None\n# Cargar los datos\nst.sidebar.header(\"Configuración de datos\")",
+        "detail": "Streamlit.StreamLitGraficos",
+        "documentation": {}
+    },
+    {
+        "label": "archivos_csv",
+        "kind": 5,
+        "importPath": "Streamlit.StreamLitGraficos",
+        "description": "Streamlit.StreamLitGraficos",
+        "peekOfCode": "archivos_csv = {\n    0: 'https://raw.githubusercontent.com/Isaac916/ProyectoContaminaci-n/feature/procesamientoDatos/Proyecto/Procesamiento/Elche-Limpio.csv',\n    1: 'https://raw.githubusercontent.com/Isaac916/ProyectoContaminaci-n/feature/procesamientoDatos/Proyecto/Procesamiento/Orihuela-Limpio.csv',\n    2: 'https://raw.githubusercontent.com/Isaac916/ProyectoContaminaci-n/feature/procesamientoDatos/Proyecto/Procesamiento/Torrevieja-Limpio.csv'\n}\n# Función para cargar los datos\ndef cargar_datos(url):\n    response = requests.get(url)\n    if response.status_code == 200:\n        data = pd.read_csv(StringIO(response.text), sep=';')",
+        "detail": "Streamlit.StreamLitGraficos",
+        "documentation": {}
+    },
+    {
+        "label": "estacion_opcion",
+        "kind": 5,
+        "importPath": "Streamlit.StreamLitGraficos",
+        "description": "Streamlit.StreamLitGraficos",
+        "peekOfCode": "estacion_opcion = st.sidebar.selectbox(\"Selecciona la estación de monitoreo:\", [\"ELX - AGROALIMENTARI\", \"ORIHUELA\", \"TORREVIEJA\"])\nestacion_index = [\"ELX - AGROALIMENTARI\", \"ORIHUELA\", \"TORREVIEJA\"].index(estacion_opcion)\ndata = cargar_datos(archivos_csv[estacion_index])\nif data is not None:\n    st.sidebar.markdown(\"### Opciones de filtrado\")\n    columnas_seleccionadas = st.sidebar.multiselect(\"Selecciona las columnas a mostrar:\", data.columns, default=data.columns)\n    data_filtrada = data[columnas_seleccionadas]\n    st.markdown(f\"### Datos de la estación: {estacion_opcion}\")\n    st.dataframe(data_filtrada, use_container_width=True)\n    # Gráficos",
+        "detail": "Streamlit.StreamLitGraficos",
+        "documentation": {}
+    },
+    {
+        "label": "estacion_index",
+        "kind": 5,
+        "importPath": "Streamlit.StreamLitGraficos",
+        "description": "Streamlit.StreamLitGraficos",
+        "peekOfCode": "estacion_index = [\"ELX - AGROALIMENTARI\", \"ORIHUELA\", \"TORREVIEJA\"].index(estacion_opcion)\ndata = cargar_datos(archivos_csv[estacion_index])\nif data is not None:\n    st.sidebar.markdown(\"### Opciones de filtrado\")\n    columnas_seleccionadas = st.sidebar.multiselect(\"Selecciona las columnas a mostrar:\", data.columns, default=data.columns)\n    data_filtrada = data[columnas_seleccionadas]\n    st.markdown(f\"### Datos de la estación: {estacion_opcion}\")\n    st.dataframe(data_filtrada, use_container_width=True)\n    # Gráficos\n    st.markdown(\"## Visualizaciones\")",
+        "detail": "Streamlit.StreamLitGraficos",
+        "documentation": {}
+    },
+    {
+        "label": "data",
+        "kind": 5,
+        "importPath": "Streamlit.StreamLitGraficos",
+        "description": "Streamlit.StreamLitGraficos",
+        "peekOfCode": "data = cargar_datos(archivos_csv[estacion_index])\nif data is not None:\n    st.sidebar.markdown(\"### Opciones de filtrado\")\n    columnas_seleccionadas = st.sidebar.multiselect(\"Selecciona las columnas a mostrar:\", data.columns, default=data.columns)\n    data_filtrada = data[columnas_seleccionadas]\n    st.markdown(f\"### Datos de la estación: {estacion_opcion}\")\n    st.dataframe(data_filtrada, use_container_width=True)\n    # Gráficos\n    st.markdown(\"## Visualizaciones\")\n    # Gráfico de línea",
+        "detail": "Streamlit.StreamLitGraficos",
         "documentation": {}
     },
     {
