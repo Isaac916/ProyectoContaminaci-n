@@ -4,19 +4,16 @@ import requests
 import plotly.express as px
 from io import StringIO
 
-# Configuración de la página
 st.set_page_config(page_title="Análisis de Contaminación", layout="wide")
 st.title("📊 Análisis de Datos de Contaminación")
 st.markdown("## Visualiza, filtra y analiza los datos de contaminación ambiental de Elche, Orihuela y Torrevieja.")
 
-# URLs de los CSV en GitHub
 archivos_csv = {
     0: 'https://raw.githubusercontent.com/Isaac916/ProyectoContaminaci-n/feature/procesamientoDatos/Proyecto/Procesamiento/Elche-Limpio.csv',
     1: 'https://raw.githubusercontent.com/Isaac916/ProyectoContaminaci-n/feature/procesamientoDatos/Proyecto/Procesamiento/Orihuela-Limpio.csv',
     2: 'https://raw.githubusercontent.com/Isaac916/ProyectoContaminaci-n/feature/procesamientoDatos/Proyecto/Procesamiento/Torrevieja-Limpio.csv'
 }
 
-# Función para cargar los datos
 def cargar_datos(url):
     response = requests.get(url)
     if response.status_code == 200:
@@ -26,7 +23,6 @@ def cargar_datos(url):
         st.error(f"Error al cargar el archivo desde {url}")
         return None
 
-# Cargar los datos
 st.sidebar.header("Configuración de datos")
 estacion_opcion = st.sidebar.selectbox("Selecciona la estación de monitoreo:", ["ELX - AGROALIMENTARI", "ORIHUELA", "TORREVIEJA"])
 estacion_index = ["ELX - AGROALIMENTARI", "ORIHUELA", "TORREVIEJA"].index(estacion_opcion)
@@ -66,13 +62,6 @@ if data is not None:
         data_bar = data.groupby("HORA")[contaminante_bar].mean().reset_index()
         fig_bar = px.bar(data_bar, x="HORA", y=contaminante_bar, title=f"Promedio de {contaminante_bar} por hora")
         st.plotly_chart(fig_bar, use_container_width=True)
-
-    # Gráfico de mapa (si hay coordenadas, opcional)
-    if "Direc." in data.columns and "Veloc." in data.columns:
-        st.markdown("### Dirección y velocidad del viento")
-        fig_wind = px.scatter_polar(data, r="Veloc.", theta="Direc.", color="H.Rel.",
-                                    title="Dirección y velocidad del viento")
-        st.plotly_chart(fig_wind, use_container_width=True)
-
+        
 st.markdown("---")
 st.markdown("**Desarrollado por [Isaac Abarca | Javi Gomez | Troy Barker]** • [GitHub](https://github.com/Isaac916/ProyectoContaminaci-n) • © 2025")
